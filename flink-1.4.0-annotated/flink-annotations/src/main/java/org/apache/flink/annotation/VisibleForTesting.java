@@ -26,10 +26,12 @@ import java.lang.annotation.Target;
 /**
  * This annotations declares that a function, field, constructor, or entire type, is only visible for
  * testing purposes.
+ * 此注解声明一个函数、字段、构造函数或整个类型只能用于测试目的。
  *
  * <p>This annotation is typically attached when for example a method should be {@code private}
  * (because it is not intended to be called externally), but cannot be declared private, because
  * some tests need to have access to it.
+ * 这个注释通常使用在例如一个方法应该是 private (因为它不打算被外部调用)，但是不能被声明为私有，因为有些测试需要访问它的场景。
  */
 @Documented
 @Target({ ElementType.TYPE, ElementType.METHOD, ElementType.FIELD, ElementType.CONSTRUCTOR })

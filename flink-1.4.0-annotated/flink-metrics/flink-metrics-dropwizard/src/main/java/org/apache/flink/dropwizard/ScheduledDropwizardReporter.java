@@ -50,6 +50,7 @@ import java.util.SortedMap;
 /**
  * Base class for {@link org.apache.flink.metrics.reporter.MetricReporter} that wraps a
  * Dropwizard {@link com.codahale.metrics.Reporter}.
+ * 实现 MetricReporter 的基类，包装了一个 Dropwizard Reporter。
  */
 @PublicEvolving
 public abstract class ScheduledDropwizardReporter implements MetricReporter, Scheduled, Reporter, CharacterFilter {

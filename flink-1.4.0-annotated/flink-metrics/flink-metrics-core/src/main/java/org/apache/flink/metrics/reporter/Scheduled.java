@@ -20,12 +20,14 @@ package org.apache.flink.metrics.reporter;
 
 /**
  * Interface for reporters that actively send out data periodically.
+ * 定期主动为 Reporters 发送数据的接口。
  */
 public interface Scheduled {
 
 	/**
 	 * Report the current measurements. This method is called periodically by the
 	 * metrics registry that uses the reporter.
+	 * 报告当期的度量值，由指标注册器定期的调度这个方法发送数据给 reporter 使用
 	 */
 	void report();
 }

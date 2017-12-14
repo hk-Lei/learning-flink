@@ -20,28 +20,33 @@ package org.apache.flink.metrics;
 
 /**
  * A MeterView provides an average rate of events per second over a given time period.
+ * MeterView提供了给定时间段内每秒事件的平均速率。
  *
  * <p>The primary advantage of this class is that the rate is neither updated by the computing thread nor for every event.
  * Instead, a history of counts is maintained that is updated in regular intervals by a background thread. From this
  * history a rate is derived on demand, which represents the average rate of events over the given time span.
+ * 这个类的主要优点是，该速率既不是由计算线程更新的，也不是每一个事件都更新的。
+ * 相反，是一个后台线程通过维护计数的历史记录定期更新的。从这段历史中，可以得出一个速率，它表示给定时间跨度内事件的平均速率。
  *
  * <p>Setting the time span to a low value reduces memory-consumption and will more accurately report short-term changes.
  * The minimum value possible is {@link View#UPDATE_INTERVAL_SECONDS}.
  * A high value in turn increases memory-consumption, since a longer history has to be maintained, but will result in
  * smoother transitions between rates.
+ * 将时间跨度设置得比较小可以减少内存消耗，并能更准确地报告短期变化，其最小时间跨度可能是 5 秒（View.UPDATE_INTERVAL_SECONDS）。
+ * 相反的，大的时间跨度会增加内存消耗，因为要保持较长的历史，但这样会导致速率间的波动更为平稳
  *
  * <p>The events are counted by a {@link Counter}.
  */
 public class MeterView implements Meter, View {
-	/** The underlying counter maintaining the count. */
+	/** The underlying counter maintaining the count. 维护统计值的内部计数器 */
 	private final Counter counter;
-	/** The time-span over which the average is calculated. */
+	/** The time-span over which the average is calculated. 计算平均值的时间跨度 */
 	private final int timeSpanInSeconds;
-	/** Circular array containing the history of values. */
+	/** Circular array containing the history of values. 包含值历史的循环数组 */
 	private final long[] values;
-	/** The index in the array for the current time. */
+	/** The index in the array for the current time. 数组中当前时间的索引 */
 	private int time = 0;
-	/** The last rate we computed. */
+	/** The last rate we computed. 我们计算的一个最近速率。*/
 	private double currentRate = 0;
 
 	public MeterView(int timeSpanInSeconds) {

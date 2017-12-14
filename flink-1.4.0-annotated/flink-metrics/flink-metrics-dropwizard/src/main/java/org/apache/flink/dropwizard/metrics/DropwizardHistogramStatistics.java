@@ -25,6 +25,8 @@ import com.codahale.metrics.Snapshot;
 /**
  * Dropwizard histogram statistics implementation returned by {@link DropwizardHistogramWrapper}.
  * The statistics class wraps a {@link Snapshot} instance and forwards the method calls accordingly.
+ * DropwizardHistogramWrapper 返回的 Dropwizard 直方图统计指标实现类
+ * 该统计类包装了一个 Snapshot 的实例，并相应的包装了其方法调用。
  */
 class DropwizardHistogramStatistics extends HistogramStatistics {
 

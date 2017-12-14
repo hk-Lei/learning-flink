@@ -33,6 +33,8 @@ import java.io.Serializable;
  * is called with a {@link SourceContext} that can be used for emitting elements.
  * The run method can run for as long as necessary. The source must, however, react to an
  * invocation of {@link #cancel()} by breaking out of its main loop.
+ * Flink 中所有流数据源的底层接口，流数据源必须遵循以下规则：
+ *   + 当
  *
  * <h3>Checkpointed Sources</h3>
  *
@@ -151,6 +153,7 @@ public interface SourceFunction<T> extends Function, Serializable {
 
 	/**
 	 * Interface that source functions use to emit elements, and possibly watermarks.
+	 * SourceFunction 用来 emit 元素 (可能是 watermark) 的接口
 	 *
 	 * @param <T> The type of the elements produced by the source.
 	 */

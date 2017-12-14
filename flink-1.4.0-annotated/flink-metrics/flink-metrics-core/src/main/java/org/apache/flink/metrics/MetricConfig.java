@@ -22,6 +22,7 @@ import java.util.Properties;
 
 /**
  * A properties class with added utility method to extract primitives.
+ * 装饰者模式，加入提取类型的方法及默认值的参数
  */
 public class MetricConfig extends Properties {
 

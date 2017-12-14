@@ -20,9 +20,11 @@ package org.apache.flink.metrics;
 
 /**
  * Histogram statistics represent the current snapshot of elements recorded in the histogram.
+ * 直方图统计数据表示在直方图中记录的元素的当前快照。
  *
  * <p>The histogram statistics allow to calculate values for quantiles, the mean, the standard
  * deviation, the minimum and the maximum.
+ * <p>直方图统计指标允许计算分位数、均值、标准差、最小值和最大值。
  */
 public abstract class HistogramStatistics {
 

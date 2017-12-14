@@ -34,6 +34,7 @@ import java.util.Map;
 
 /**
  * Base interface for custom metric reporters.
+ * 定制的指标 reporter 的基础接口
  */
 public abstract class AbstractReporter implements MetricReporter, CharacterFilter {
 	protected final Logger log = LoggerFactory.getLogger(getClass());

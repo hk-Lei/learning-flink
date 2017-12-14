@@ -20,11 +20,13 @@ package org.apache.flink.metrics;
 
 /**
  * A Gauge is a {@link Metric} that calculates a specific value at a point in time.
+ * Gauge 指标指在一个时间点计算一个特定的值
  */
 public interface Gauge<T> extends Metric {
 
 	/**
 	 * Calculates and returns the measured value.
+	 * 计算并返回测量值。
 	 *
 	 * @return calculated value
 	 */

@@ -22,11 +22,14 @@ import java.util.Map;
 
 /**
  * A MetricGroup is a named container for {@link Metric Metrics} and further metric subgroups.
+ * MetricGroup 是 Flink 指标及指标子分组的容器
  *
  * <p>Instances of this class can be used to register new metrics with Flink and to create a nested
  * hierarchy based on the group names.
+ * 该类的实例可用于用 Flink 注册新指标，并基于组名称创建嵌套层次结构。
  *
  * <p>A MetricGroup is uniquely identified by it's place in the hierarchy and name.
+ * 一个 MetricGroup 在其层次结构的位置和名称中的是被唯一标识的。
  */
 public interface MetricGroup {
 
@@ -136,6 +139,7 @@ public interface MetricGroup {
 
 	/**
 	 * Creates a new MetricGroup and adds it to this groups sub-groups.
+	 * 创建一个新的 MetricGroup 并将其添加到这个组的子组中。
 	 *
 	 * @param name name of the group
 	 * @return the created group
@@ -157,6 +161,7 @@ public interface MetricGroup {
 	/**
 	 * Gets the scope as an array of the scope components, for example
 	 * {@code ["host-7", "taskmanager-2", "window_word_count", "my-mapper"]}.
+	 * 获取作为范围组件的范围数组，例如 {@code ["host-7", "taskmanager-2", "window_word_count", "my-mapper"]}
 	 *
 	 * @see #getMetricIdentifier(String)
 	 * @see #getMetricIdentifier(String, CharacterFilter)
