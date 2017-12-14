@@ -20,6 +20,19 @@ package org.apache.flink.runtime.metrics;
 
 /**
  * Collection of metric names.
+ * 指标名称集合 :
+ *   numRecordsIn
+ *   numRecordsOut
+ *   numRecordsInPerSecond
+ *   numRecordsOutPerSecond
+ *   numBytesIn
+ *   numBytesInLocal
+ *   numBytesInRemote
+ *   numBytesOut
+ *   numBytesOutLocal
+ *   numBytesOutRemote
+ *   numBytesOutPerSecond
+ *
  */
 public class MetricNames {
 	private MetricNames() {

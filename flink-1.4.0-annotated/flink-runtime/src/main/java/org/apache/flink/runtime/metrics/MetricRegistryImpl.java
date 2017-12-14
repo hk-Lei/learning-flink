@@ -60,6 +60,7 @@ import scala.concurrent.duration.FiniteDuration;
 /**
  * A MetricRegistry keeps track of all registered {@link Metric Metrics}. It serves as the
  * connection between {@link MetricGroup MetricGroups} and {@link MetricReporter MetricReporters}.
+ * MetricRegistry 持续跟踪所有注册的 Metrics，它连接了 MetricGroups 和 MetricReporters
  */
 public class MetricRegistryImpl implements MetricRegistry {
 	static final Logger LOG = LoggerFactory.getLogger(MetricRegistryImpl.class);
@@ -83,6 +84,7 @@ public class MetricRegistryImpl implements MetricRegistry {
 
 	/**
 	 * Creates a new MetricRegistry and starts the configured reporter.
+	 * 创建一个新的 MetricRegistry ，并启动配置的 reporter。
 	 */
 	public MetricRegistryImpl(MetricRegistryConfiguration config) {
 		this.scopeFormats = config.getScopeFormats();
