@@ -30,6 +30,14 @@ import org.apache.flink.configuration.HighAvailabilityOptions;
  * ZooKeeper is used to select a leader among a group of JobManager. This JobManager
  * is responsible for the job execution. Upon failure of the leader a new leader is elected
  * which will take over the responsibilities of the old leader
+ *
+ * Flink的集群执行的高可用性模式。目前支持的模式是:
+ *
+ * - NONE: 无高可用模式
+ * - Zookeeper: 通过 Zookeeper 实现的 JobManager 的高可用模式
+ *
+ * Zookeeper 被用于在一组 JobManager 中挑选一名 leader。由该 JobManager 负责 job 的执行。
+ * 一旦这个 leader 异常，会选出新的 leader 来接替老 leader 的职责
  */
 public enum HighAvailabilityMode {
 	NONE,
@@ -37,6 +45,7 @@ public enum HighAvailabilityMode {
 
 	/**
 	 * Return the configured {@link HighAvailabilityMode}.
+	 * 返回配置的 HighAvailabilityMode 。
 	 *
 	 * @param config The config to parse
 	 * @return Configured recovery mode or {@link ConfigConstants#DEFAULT_HA_MODE} if not
@@ -57,6 +66,7 @@ public enum HighAvailabilityMode {
 
 	/**
 	 * Returns true if the defined recovery mode supports high availability.
+	 * 如果定义的恢复模式支持高可用性，那么返回 true。
 	 *
 	 * @param configuration Configuration which contains the recovery mode
 	 * @return true if high availability is supported by the recovery mode, otherwise false

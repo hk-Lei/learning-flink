@@ -49,31 +49,38 @@ import static org.apache.flink.util.StringUtils.isNullOrWhitespaceOnly;
 
 /**
  * Utility class to work with blob data.
+ * 用于处理 blob 数据的工具类。
  */
 public class BlobUtils {
 
 	/**
 	 * Algorithm to be used for calculating the BLOB keys.
+	 * 用于计算BLOB键的算法。使用的是 SHA-1
 	 */
 	private static final String HASHING_ALGORITHM = "SHA-1";
 
 	/**
 	 * The prefix of all BLOB files stored by the BLOB server.
+	 * BLOB 服务存储的所有 BLOB 文件的前缀。为 "blob_"
 	 */
 	private static final String BLOB_FILE_PREFIX = "blob_";
 
 	/**
 	 * The prefix of all job-specific directories created by the BLOB server.
+	 * 由 BLOB 服务创建的所有特定 Job 的目录的前缀。为 "job_"
 	 */
 	static final String JOB_DIR_PREFIX = "job_";
 
 	/**
 	 * The prefix of all job-unrelated directories created by the BLOB server.
+	 * 由 BLOB 服务创建的所有与 Job 无关的目录的前缀。为 "no_job"
 	 */
 	static final String NO_JOB_DIR_PREFIX = "no_job";
 
 	/**
 	 * Creates a BlobStore based on the parameters set in the configuration.
+	 *
+	 * 根据配置中的参数创建一个BlobStore。
 	 *
 	 * @param config
 	 * 		configuration to use
@@ -87,6 +94,7 @@ public class BlobUtils {
 		HighAvailabilityMode highAvailabilityMode = HighAvailabilityMode.fromConfig(config);
 
 		if (highAvailabilityMode == HighAvailabilityMode.NONE) {
+			// 如果不是高可用模式就创建一个什么都不做的 BlobStore
 			return new VoidBlobStore();
 		} else if (highAvailabilityMode == HighAvailabilityMode.ZOOKEEPER) {
 			return createFileSystemBlobStore(config);
@@ -95,6 +103,7 @@ public class BlobUtils {
 		}
 	}
 
+	// 创建高可用模式下的 Blob Store
 	private static BlobStoreService createFileSystemBlobStore(Configuration configuration) throws IOException {
 		String storagePath = configuration.getValue(
 			HighAvailabilityOptions.HA_STORAGE_PATH);
