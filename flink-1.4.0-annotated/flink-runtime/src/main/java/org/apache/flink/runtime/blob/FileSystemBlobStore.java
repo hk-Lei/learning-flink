@@ -41,6 +41,10 @@ import static org.apache.flink.util.Preconditions.checkNotNull;
  * Blob store backed by {@link FileSystem}.
  *
  * <p>This is used in addition to the local blob storage for high availability.
+ *
+ * Blob 存储背后的文件系统
+ *
+ * <p>除了本地的 blob 存储之外，还用于高可用模式。
  */
 public class FileSystemBlobStore implements BlobStoreService {
 
@@ -104,6 +108,7 @@ public class FileSystemBlobStore implements BlobStoreService {
 			LOG.debug("Copying from {} to {}.", fromBlobPath, toFile);
 
 			// not using IOUtils.copyBytes(is, fos) here to be able to create a hash on-the-fly
+			// 不使用 IOUtils.copyBytes(is, fos)，在这里可以动态创建一个散列
 			final byte[] buf = new byte[buffSize];
 			int bytesRead = is.read(buf);
 			while (bytesRead >= 0) {
@@ -114,6 +119,7 @@ public class FileSystemBlobStore implements BlobStoreService {
 			}
 
 			// verify that file contents are correct
+			// 验证文件内容是否正确
 			final byte[] computedKey = md.digest();
 			if (!Arrays.equals(computedKey, blobKey.getHash())) {
 				throw new IOException("Detected data corruption during transfer");
@@ -123,6 +129,7 @@ public class FileSystemBlobStore implements BlobStoreService {
 		} finally {
 			// if the copy fails, we need to remove the target file because
 			// outside code relies on a correct file as long as it exists
+			// 如果复制失败，我们需要删除目标文件
 			if (!success) {
 				try {
 					toFile.delete();
@@ -155,6 +162,7 @@ public class FileSystemBlobStore implements BlobStoreService {
 
 			// send a call to delete the directory containing the file. This will
 			// fail (and be ignored) when some files still exist.
+			// 发送一个调用来删除包含该文件的目录。当某些文件仍然存在时，将会失败(并被忽略)。
 			try {
 				fileSystem.delete(path.getParent(), false);
 				fileSystem.delete(new Path(basePath), false);

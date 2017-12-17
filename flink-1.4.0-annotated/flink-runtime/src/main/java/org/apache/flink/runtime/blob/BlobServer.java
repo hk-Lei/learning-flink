@@ -734,8 +734,10 @@ public class BlobServer extends Thread implements BlobService, BlobWriter, Perma
 						incomingFile, jobId, blobKey, storageFile, LOG,
 						blobKey instanceof PermanentBlobKey ? blobStore : null);
 					// add TTL for transient BLOBs:
+					// 添加 TTL 用于临时的 blob:
 					if (blobKey instanceof TransientBlobKey) {
 						// must be inside read or write lock to add a TTL
+						// 必须是内部读取或写入锁，以添加 TTL
 						blobExpiryTimes
 							.put(Tuple2.of(jobId, (TransientBlobKey) blobKey),
 								System.currentTimeMillis() + cleanupInterval);

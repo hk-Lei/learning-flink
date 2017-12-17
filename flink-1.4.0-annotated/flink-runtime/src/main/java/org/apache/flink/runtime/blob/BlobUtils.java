@@ -290,6 +290,8 @@ public class BlobUtils {
 	/**
 	 * Creates a new instance of the message digest to use for the BLOB key computation.
 	 *
+	 * 创建一个 MessageDigest 实例用于 Blob key 的计算，算法是 SHA-1
+	 *
 	 * @return a new instance of the message digest to use for the BLOB key computation
 	 */
 	static MessageDigest createMessageDigest() {
@@ -433,6 +435,8 @@ public class BlobUtils {
 	 * Moves the temporary <tt>incomingFile</tt> to its permanent location where it is available for
 	 * use (not thread-safe!).
 	 *
+	 * 将临时文件移动到它可以使用的永久位置 (不是线程安全的！)
+	 *
 	 * @param incomingFile
 	 * 		temporary file created during transfer
 	 * @param jobId
@@ -455,9 +459,11 @@ public class BlobUtils {
 
 		try {
 			// first check whether the file already exists
+			// 首先检查文件是否已经存在
 			if (!storageFile.exists()) {
 				try {
 					// only move the file if it does not yet exist
+					// 如果还不存在，只移动文件
 					Files.move(incomingFile.toPath(), storageFile.toPath());
 
 					incomingFile = null;
@@ -468,11 +474,15 @@ public class BlobUtils {
 					// we cannot be sure at this point whether the file has already been uploaded to the blob
 					// store or not. Even if the blobStore might shortly be in an inconsistent state, we have
 					// to persist the blob. Otherwise we might not be able to recover the job.
+
+					// 我们不能确定这个文件是否已经上传到 blob 存储中。
+					// 即使 blobStore 可能出现短暂的不一致的状态，我们也必须持久化这个blob。否则，我们可能无法恢复工作。
 				}
 
 				if (blobStore != null) {
 					// only the one moving the incoming file to its final destination is allowed to upload the
 					// file to the blob store
+					// 只有将传入文件移动到最终目的地的文件才允许被上传到 blob 存储中。
 					blobStore.put(storageFile, jobId, blobKey);
 				}
 			} else {
@@ -482,6 +492,7 @@ public class BlobUtils {
 		} finally {
 			// we failed to either create the local storage file or to upload it --> try to delete the local file
 			// while still having the write lock
+			// 当我们失败时，我们需要尝试在持有写锁的情况下删除本地文件
 			if (storageFile != null && !storageFile.delete() && storageFile.exists()) {
 				log.warn("Could not delete the storage file {}.", storageFile);
 			}

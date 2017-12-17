@@ -31,6 +31,8 @@ import java.io.InputStream;
 
 /**
  * BlobWriter is used to upload data to the BLOB store.
+ *
+ * BlobWriter 用于将数据上传到 BLOB 存储。
  */
 public interface BlobWriter {
 
@@ -39,6 +41,8 @@ public interface BlobWriter {
 	/**
 	 * Uploads the data of the given byte array for the given job to the BLOB server and makes it
 	 * a permanent BLOB.
+	 *
+	 * 将 Job 的给定字节数组的数据上传到 BLOB 服务器，并使其成为一个永久的 BLOB。
 	 *
 	 * @param jobId
 	 * 		the ID of the job the BLOB belongs to
@@ -57,6 +61,8 @@ public interface BlobWriter {
 	 * Uploads the data from the given input stream for the given job to the BLOB server and makes it
 	 * a permanent BLOB.
 	 *
+	 * 将 Job 给定的输入流中的数据上传到 BLOB 服务器，并使其成为一个永久的 BLOB。
+	 *
 	 * @param jobId
 	 * 		ID of the job this blob belongs to
 	 * @param inputStream
@@ -73,6 +79,8 @@ public interface BlobWriter {
 	/**
 	 * Returns the min size before data will be offloaded to the BLOB store.
 	 *
+	 * 返回最小写入块大小
+	 *
 	 * @return minimum offloading size
 	 */
 	int getMinOffloadingSize();
@@ -80,6 +88,8 @@ public interface BlobWriter {
 	/**
 	 * Serializes the given value and offloads it to the BlobServer if its size exceeds the minimum
 	 * offloading size of the BlobServer.
+	 *
+	 * 如果给定值的大小超过 BlobServer 的最小写入块大小，序列化给定值并将其写入到 BlobServer
 	 *
 	 * @param value to serialize
 	 * @param jobId to which the value belongs.
