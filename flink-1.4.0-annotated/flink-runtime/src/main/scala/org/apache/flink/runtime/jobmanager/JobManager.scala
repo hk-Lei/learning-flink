@@ -118,6 +118,10 @@ import scala.language.postfixOps
  *
  * - [[JobStatusChanged]] indicates that the status of job (RUNNING, CANCELING, FINISHED, etc.) has
  * changed. This message is sent by the ExecutionGraph.
+ *
+ * JobManager 负责接收 Flink job、调度 job 的 task、收集 job 状态及管理 TaskManager。它是使用 Actor 实现的，会收到如下的消息:
+ *
+ *  - [[RegisterTaskManager]]
  */
 class JobManager(
     protected val flinkConfiguration: Configuration,
@@ -1882,10 +1886,13 @@ class JobManager(
 }
 
 /**
- * Job Manager companion object. Contains the entry point (main method) to run the JobManager in a
- * standalone fashion. Also contains various utility methods to start the JobManager and to
- * look up the JobManager actor reference.
- */
+  * Job Manager companion object. Contains the entry point (main method) to run the JobManager in a
+  * standalone fashion. Also contains various utility methods to start the JobManager and to
+  * look up the JobManager actor reference.
+  *
+  * JobManager 的伴生对象，包含以 standalone 方式运行 JobManager 的入口点(main方法)。
+  * 还包含了启动 JobManager 和查找 JobManager Actor 引用等各种实用方法。
+  */
 object JobManager {
 
   val LOG = Logger(classOf[JobManager])
@@ -1895,17 +1902,21 @@ object JobManager {
 
 
   /**
-   * Entry point (main method) to run the JobManager in a standalone fashion.
-   *
-   * @param args The command line arguments.
-   */
+    * Entry point (main method) to run the JobManager in a standalone fashion.
+    *
+    * 以 standalone 方式运行 JobManager 的入口点(main方法)
+    *
+    * @param args The command line arguments.
+    */
   def main(args: Array[String]): Unit = {
     // startup checks and logging
+    // 启动时检查、打印日志
     EnvironmentInformation.logEnvironmentInfo(LOG.logger, "JobManager", args)
     SignalHandler.register(LOG.logger)
     JvmShutdownSafeguard.installAsShutdownHook(LOG.logger)
 
     // parsing the command line arguments
+    // 解析命令行参数
     val (configuration: Configuration,
          executionMode: JobManagerMode,
          externalHostName: String,
@@ -2294,6 +2305,8 @@ object JobManager {
   /**
    * Loads the configuration, execution mode and the listening address from the provided command
    * line arguments.
+   *
+   * 从命令行参数中加载配置、执行模式和监听地址。
    *
    * @param args command line arguments
    * @return Quadruple of configuration, execution mode and an optional listening address

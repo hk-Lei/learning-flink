@@ -36,6 +36,7 @@ import java.util.regex.Pattern;
 
 /**
  * Configuration object for {@link MetricRegistryImpl}.
+ * MetricRegistryImpl 是配置类
  */
 public class MetricRegistryConfiguration {
 
@@ -44,15 +45,19 @@ public class MetricRegistryConfiguration {
 	private static volatile MetricRegistryConfiguration defaultConfiguration;
 
 	// regex pattern to split the defined reporters
+	/** 正则模式分割定义的 reporters */
 	private static final Pattern splitPattern = Pattern.compile("\\s*,\\s*");
 
 	// scope formats for the different components
+	/** 不同组件的 Scope 格式 */
 	private final ScopeFormats scopeFormats;
 
 	// delimiter for the scope strings
+	/** 用于 scope 字符串的分隔符 */
 	private final char delimiter;
 
 	// contains for every configured reporter its name and the configuration object
+	/** 包含每个已配置的 reporter 的名称和其配置对象 */
 	private final List<Tuple2<String, Configuration>> reporterConfigurations;
 
 	public MetricRegistryConfiguration(
@@ -83,10 +88,12 @@ public class MetricRegistryConfiguration {
 
 	// ------------------------------------------------------------------------
 	//  Static factory methods
+	//  静态工厂方法
 	// ------------------------------------------------------------------------
 
 	/**
 	 * Create a metric registry configuration object from the given {@link Configuration}.
+	 * 根据给定的配置创建一个 metrics 注册表配置对象。
 	 *
 	 * @param configuration to generate the metric registry configuration from
 	 * @return Metric registry configuration generated from the configuration

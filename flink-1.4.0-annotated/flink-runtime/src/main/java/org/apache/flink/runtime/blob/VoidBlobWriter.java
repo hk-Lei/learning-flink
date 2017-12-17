@@ -28,6 +28,9 @@ import java.io.InputStream;
  * BlobWriter which does not support writing BLOBs to a store. This class is
  * mainly used for testing purposes where we don't want to store data in the
  * BLOB store.
+ *
+ * 该 BlobWriter 不支持将 blob 写入存储。这个类主要用于测试目的，这里我们不希望在 BLOB 存储中存储数据
+ *
  */
 @VisibleForTesting
 public class VoidBlobWriter implements BlobWriter {

@@ -22,6 +22,13 @@ import static org.apache.flink.util.Preconditions.checkNotNull;
 
 /**
  * The command line parameters passed to the JobManager.
+ * 通过命令行传递参数给 JobManager
+ *
+ * 主要参数列表有：
+ *   配置文件目录
+ *   JobManager 运行模式 ： Local | Cluster
+ *   host
+ *   webUI 端口
  */
 public class JobManagerCliOptions {
 

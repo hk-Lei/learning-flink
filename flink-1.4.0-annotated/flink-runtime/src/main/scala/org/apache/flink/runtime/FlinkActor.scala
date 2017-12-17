@@ -25,6 +25,10 @@ import grizzled.slf4j.Logger
   *
   * The message handling logic is defined in the handleMessage method. This allows to mixin
   * stackable traits which change the message receiving behaviour.
+  *
+  * Flink 的 Actors 的基本特征（trait）
+  *
+  * 消息处理逻辑是在 handleMessage 方法中定义的。这允许混合叠加那些不同消息处理逻辑的特征。
   */
 trait FlinkActor extends Actor {
   val log: Logger
@@ -32,12 +36,14 @@ trait FlinkActor extends Actor {
   override def receive: Receive = handleMessage
 
   /** Handle incoming messages
+    * 处理传入的消息
     *
     * @return
     */
   def handleMessage: Receive
 
   /** Factory method for messages. This method can be used by mixins to decorate messages
+    * 工厂方法。这种方法可以用于混合装饰消息
     *
     * @param message The message to decorate
     * @return The decorated message

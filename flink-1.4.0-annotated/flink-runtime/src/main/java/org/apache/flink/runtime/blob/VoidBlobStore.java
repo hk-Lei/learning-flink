@@ -25,6 +25,8 @@ import java.io.IOException;
 
 /**
  * A blob store doing nothing.
+ *
+ * 一个什么都不做的 blob store
  */
 public class VoidBlobStore implements BlobStoreService {
 

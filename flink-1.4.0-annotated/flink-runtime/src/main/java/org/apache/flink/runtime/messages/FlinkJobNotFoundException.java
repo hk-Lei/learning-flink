@@ -23,6 +23,7 @@ import org.apache.flink.util.FlinkException;
 
 /**
  * Exception indicating that we could not find a Flink job with the given job ID.
+ * 异常表示我们找不到一个给定 Job ID 的 Flink Job。
  */
 public class FlinkJobNotFoundException extends FlinkException {
 

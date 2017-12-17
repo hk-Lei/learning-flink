@@ -34,6 +34,7 @@ import org.slf4j.LoggerFactory;
 
 /**
  * Simple manager that keeps track of which TaskManager are available and alive.
+ * 一个简单的管理器用于跟踪哪一个 TaskManager 是可用的、活着的。
  */
 public class InstanceManager {
 

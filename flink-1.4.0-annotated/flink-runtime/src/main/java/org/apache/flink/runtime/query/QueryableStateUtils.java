@@ -31,6 +31,7 @@ import java.util.Iterator;
 
 /**
  * Utility class to initialize entities used in queryable state.
+ * 实用程序类来初始化在可查询状态中使用的实体。
  */
 public final class QueryableStateUtils {
 

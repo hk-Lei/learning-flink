@@ -27,6 +27,7 @@ public class MetricOptions {
 	/**
 	 * The list of named reporters. Names are defined here and per-reporter configs
 	 * are given with the reporter config prefix and the reporter name.
+	 * 内置的 Reporters 的列表。这里定义了名称，并给出了预配置
 	 *
 	 * Example:
 	 * <pre>{@code

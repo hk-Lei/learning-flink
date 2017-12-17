@@ -65,44 +65,58 @@ import static org.apache.flink.util.Preconditions.checkNotNull;
  * This class implements the BLOB server. The BLOB server is responsible for listening for incoming requests and
  * spawning threads to handle these requests. Furthermore, it takes care of creating the directory structure to store
  * the BLOBs or temporarily cache them.
+ *
+ * 这个类实现了 BLOB 服务，负责监听请求并生成处理这些请求的线程。此外，它还需要创建目录结构来存储 blobs 或临时缓存它们。
  */
 public class BlobServer extends Thread implements BlobService, BlobWriter, PermanentBlobService, TransientBlobService {
 
 	/** The log object used for debugging. */
+	/** 用于调试的日志对象。 */
 	private static final Logger LOG = LoggerFactory.getLogger(BlobServer.class);
 
 	/** Counter to generate unique names for temporary files. */
+	/** 为临时文件生成惟一名称的 计数器。 */
 	private final AtomicLong tempFileCounter = new AtomicLong(0);
 
 	/** The server socket listening for incoming connections. */
+	/** 监听 Socket 连接的服务 */
 	private final ServerSocket serverSocket;
 
-	/** The SSL server context if ssl is enabled for the connections */
+	/** The SSL server context if ssl is enabled for the connections. */
+	/** 如果为连接启用了SSL，存储 SSL 服务上下文 */
 	private final SSLContext serverSSLContext;
 
 	/** Blob Server configuration */
+	/** Blob 服务的配置信息 */
 	private final Configuration blobServiceConfiguration;
 
 	/** Indicates whether a shutdown of server component has been requested. */
+	/** 代表是否已请求关闭服务器组件。*/
 	private final AtomicBoolean shutdownRequested = new AtomicBoolean();
 
 	/** Root directory for local file storage */
+	/** 本地文件存储的根目录 */
 	private final File storageDir;
 
 	/** Blob store for distributed file storage, e.g. in HA */
+	/** 用于分布式文件存储的 Blob 存储，例如在 HA 模式中 */
 	private final BlobStore blobStore;
 
 	/** Set of currently running threads */
+	/** 当前正在运行的线程的集合 */
 	private final Set<BlobServerConnection> activeConnections = new HashSet<>();
 
 	/** The maximum number of concurrent connections */
+	/** 最大并发连接数 */
 	private final int maxConnections;
 
 	/** Lock guarding concurrent file accesses */
+	/** 并发访问文件的保护锁 */
 	private final ReadWriteLock readWriteLock;
 
 	/**
 	 * Shutdown hook thread to ensure deletion of the local storage directory.
+	 * 保障关闭时删除本地存储目录的线程
 	 */
 	private final Thread shutdownHook;
 
@@ -111,15 +125,19 @@ public class BlobServer extends Thread implements BlobService, BlobWriter, Perma
 	/**
 	 * Map to store the TTL of each element stored in the local storage, i.e. via one of the {@link
 	 * #getFile} methods.
+	 *
+	 * 映射存储在本地存储中的每个元素（例如通过一个 getFile 方法获取的文件）的 TTL
 	 **/
 	private final ConcurrentHashMap<Tuple2<JobID, TransientBlobKey>, Long> blobExpiryTimes =
 		new ConcurrentHashMap<>();
 
 	/** Time interval (ms) to run the cleanup task; also used as the default TTL. */
+	/** 运行清理任务时间间隔(ms); 也用作默认的 TTL。*/
 	private final long cleanupInterval;
 
 	/**
 	 * Timer task to execute the cleanup at regular intervals.
+	 * 定期执行清理工作的定时任务。
 	 */
 	private final Timer cleanupTimer;
 
@@ -139,11 +157,13 @@ public class BlobServer extends Thread implements BlobService, BlobWriter, Perma
 		this.readWriteLock = new ReentrantReadWriteLock();
 
 		// configure and create the storage directory
+		// 配置并创建存储目录
 		String storageDirectory = config.getString(BlobServerOptions.STORAGE_DIRECTORY);
 		this.storageDir = BlobUtils.initLocalStorageDirectory(storageDirectory);
 		LOG.info("Created BLOB server storage directory {}", storageDir);
 
 		// configure the maximum number of concurrent connections
+		// 配置最大并发连接数
 		final int maxConnections = config.getInteger(BlobServerOptions.FETCH_CONCURRENT);
 		if (maxConnections >= 1) {
 			this.maxConnections = maxConnections;
@@ -155,6 +175,7 @@ public class BlobServer extends Thread implements BlobService, BlobWriter, Perma
 		}
 
 		// configure the backlog of connections
+		// 配置积压的连接数
 		int backlog = config.getInteger(BlobServerOptions.FETCH_BACKLOG);
 		if (backlog < 1) {
 			LOG.warn("Invalid value for BLOB connection backlog: {}. Using default value of {}",
@@ -163,13 +184,16 @@ public class BlobServer extends Thread implements BlobService, BlobWriter, Perma
 		}
 
 		// Initializing the clean up task
+		// 初始化清理任务
 		this.cleanupTimer = new Timer(true);
 
+		// 获取清理任务的时间间隔，默认 3600s 即 1个小时
 		this.cleanupInterval = config.getLong(BlobServerOptions.CLEANUP_INTERVAL) * 1000;
 		this.cleanupTimer
 			.schedule(new TransientBlobCleanupTask(blobExpiryTimes, readWriteLock.writeLock(),
 				storageDir, LOG), cleanupInterval, cleanupInterval);
 
+		// 添加关闭时的清理任务： this.close()
 		this.shutdownHook = BlobUtils.addShutdownHook(this, LOG);
 
 		if (config.getBoolean(BlobServerOptions.SSL_ENABLED)) {

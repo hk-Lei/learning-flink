@@ -126,11 +126,20 @@ import static org.apache.flink.util.Preconditions.checkNotNull;
  * <ul>
  * <li>{@link #updateTaskExecutionState} updates the task execution state for
  * given task</li>
+ * <li>{@link #updateTaskExecutionState} 更新给定 task 的执行状态</li>
  * </ul>
+ *
+ * JobMaster 负责执行单个的 JobGraph.
+ * <p>
+ * 它提供以下方法作为其 rpc 接口的一部分，以便远程与 JobMaster 交互:
+ * <ul>
+ * <li>{@link #updateTaskExecutionState} 更新给定 task 的执行状态</li>
+ * </ul>
+ *
  */
 public class JobMaster extends FencedRpcEndpoint<JobMasterId> implements JobMasterGateway {
 
-	/** Default names for Flink's distributed components */
+	/** Default names for Flink's distributed components. Flink 的分布式组件的默认名称 */
 	public static final String JOB_MANAGER_NAME = "jobmanager";
 	public static final String ARCHIVE_NAME = "archive";
 

@@ -24,6 +24,8 @@ import java.net.InetSocketAddress;
  * An interface for the Queryable State Server running on each Task Manager in the cluster.
  * This server is responsible for serving requests coming from the {@link KvStateClientProxy
  * Queryable State Proxy} and requesting <b>locally</b> stored state.
+ * 集群中每个 TaskManager 上运行的可查询状态服务接口。
+ * 该服务负责来自 KvStateClientProxy 代理的请求并查询存储在本地的状态。
  */
 public interface KvStateServer {
 
@@ -38,5 +40,6 @@ public interface KvStateServer {
 	void start() throws Throwable;
 
 	/** Shuts down the server and all related thread pools. */
+	/** 关闭服务器和所有相关的线程池。 */
 	void shutdown();
 }

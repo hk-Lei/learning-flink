@@ -20,6 +20,8 @@ package org.apache.flink.runtime
 
 /** Mixin to add message logging if the debug log level is activated
   *
+  * 如果日志的 debug 基本被激活，添加处理消息的 debug 信息到日志中
+  *
   */
 trait LogMessages extends FlinkActor {
   abstract override def receive: Receive = {

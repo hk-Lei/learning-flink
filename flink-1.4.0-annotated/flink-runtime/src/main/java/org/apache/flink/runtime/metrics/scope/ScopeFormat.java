@@ -30,11 +30,14 @@ import static org.apache.flink.util.Preconditions.checkNotNull;
  * This class represents the format after which the "scope" (or namespace) of the various
  * component metric groups is built. Component metric groups are for example
  * "TaskManager", "Task", or "Operator".
+ * 这个类代表了在各种组件 metrics 组“域”(或名称空间)格式的构建， 例如："TaskManager", "Task", or "Operator"
  *
  * <p>User defined scope formats allow users to include or exclude
  * certain identifiers from the scope. The scope for metrics belonging to the "Task"
  * group could for example include the task attempt number (more fine grained identification), or
  * exclude it (continuity of the namespace across failure and recovery).
+ * 用户定义的 scope 格式允许包含或排除某些标识符。
+ * 属于 “Task” 组的度量的 scope 可以包括任务尝试号(更细粒度的标识)，或者排除它(在失败和恢复过程中连续的命名空间)。
  */
 public abstract class ScopeFormat {
 
@@ -47,15 +50,19 @@ public abstract class ScopeFormat {
 
 	// ------------------------------------------------------------------------
 	//  Scope Format Special Characters
+	//  Scope 格式特殊字符
 	// ------------------------------------------------------------------------
 
 	/**
 	 * If the scope format starts with this character, then the parent components scope
 	 * format will be used as a prefix.
+	 * 如果 Scope 从这个字符开始，那父组件的 Scope 将是其前缀。
 	 *
 	 * <p>For example, if the TaskManager's job format is {@code "*.<job_name>"}, and the
 	 * TaskManager format is {@code "<host>"}, then the job's metrics
 	 * will have {@code "<host>.<job_name>"} as their scope.
+	 * <p>例如: 如果作业 Scope 是 " *.<job_name> ", TaskManager Scope 是 "<host>",
+	 * 该 TaskManager 上作业 Metrics 的 Scope 是  "<host>.<job_name>" 。
 	 */
 	public static final String SCOPE_INHERIT_PARENT = "*";
 
@@ -66,6 +73,7 @@ public abstract class ScopeFormat {
 
 	// ------------------------------------------------------------------------
 	//  Scope Variables
+	//  变量的 Scope
 	// ------------------------------------------------------------------------
 
 	public static final String SCOPE_HOST = asVariable("host");

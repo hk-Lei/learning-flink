@@ -107,6 +107,8 @@ import static org.apache.flink.util.Preconditions.checkNotNull;
 /**
  * TaskExecutor implementation. The task executor is responsible for the execution of multiple
  * {@link Task}.
+ *
+ * TaskExecutor 实现。TaskExecutor 负责执行多个 Task
  */
 public class TaskExecutor extends RpcEndpoint implements TaskExecutorGateway {
 

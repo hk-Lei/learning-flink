@@ -59,6 +59,16 @@ import scala.concurrent.future
  *
  *  - [[RequestJobCounts]] returns the number of finished, canceled, and failed jobs as a Tuple3
  *
+ * Actor 存储了终止的 Flink Jobs。存储作业的数量上限是有 max_entries 设置的，如果超过上限，老的 job 就会被删除，
+ * 可以通过以下的消息和该 Actor 交互：
+ *
+ *  - [[ArchiveExecutionGraph]] : 归档附加的 ExecutionGraph
+ *  - [[RequestArchivedJobs]] : 将当前存储的所有[[ExecutionGraph]]发送给封装在[[ArchivedJobs]]消息中的发送方。
+ *  - [[RequestJob]] : 如果 Job 是存储在 MemoryArchivist 中的，返回封装在 JobFound 中对应的 JobGraph；反之返回 JobNotFound
+ *  - [[RequestJobStatus]] : 返回对应作业的最后状态。如果能找到该作业，则返回带有最新状态的[[CurrentJobStatus]]消息到发送方，
+ *                           否则将返回[[JobNotFound]]消息
+ *  - [[RequestJobCounts]] : 将完成、取消和失败的作业数量封装为 Tuple3 格式返回
+ *
  * @param maxEntries Maximum number of stored Flink jobs
  * @param archivePath Optional path of the job archive directory
  */

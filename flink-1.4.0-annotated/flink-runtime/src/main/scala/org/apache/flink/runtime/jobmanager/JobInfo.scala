@@ -34,6 +34,12 @@ import org.apache.flink.runtime.akka.ListeningBehaviour
  * make sure to resolve the correct [[ActorRef]]s when submitting jobs (RepointableActorRef vs.
  * RemoteActorRef).
  *
+ * 用来存储 JobManager 中作业信息的类。JobInfo 中存储了Job 的启动 Actor、启动时间、是否已经终止、终止时间信息，
+ * 此外，它还存储了 Job 的启动是否是分离模式，这里的分离模式是指 Actor 提交结束后不用等到 Job 的执行结果（即流模式）。
+ *
+ * 注意 : 这个类是可序列化的，但是需要在 actor 系统的上下文中进行反序列化，以解决客户端[[ActorRef]]。
+ * 可以手工序列化 Akka URL，但是在某些场景中测试是很复杂的，因为需要确保在提交作业时(RepointableActorRef vs RemoteActorRef)解析正确的[[ActorRef]]。
+ *
  * @param client Actor which submitted the job
  * @param start Starting time
  */

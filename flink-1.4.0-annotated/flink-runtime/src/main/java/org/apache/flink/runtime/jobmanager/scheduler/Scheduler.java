@@ -65,6 +65,14 @@ import java.util.concurrent.LinkedBlockingQueue;
  *     <li>Queued Scheduling: A request for a task slot is queued and returns a future that will be
  *         fulfilled as soon as a slot becomes available.</li>
  * </ul>
+ *
+ * 调度器负责根据实例和槽数分配准备就绪的任务。
+ *
+ * <p>调度器支持两种调度模式:</p>
+ * <ul>
+ *     <li>即可响应模式: 如果可用则立即返回 Task 的 slots 请求，否则抛出 NoResourceAvailableException 异常。</li>
+ *     <li>队列调度模式: 将 slots 的请求加入队列并返回一个 Future，当 slots 资源可用时，就会分配给他。</li>
+ * </ul>
  */
 public class Scheduler implements InstanceListener, SlotAvailabilityListener, SlotProvider {
 

@@ -168,6 +168,7 @@ public class MetricRegistryImpl implements MetricRegistry {
 
 	/**
 	 * Initializes the MetricQueryService.
+	 * 初始化 MetricQueryService
 	 *
 	 * @param actorSystem ActorSystem to create the MetricQueryService on
 	 * @param resourceID resource ID used to disambiguate the actor name

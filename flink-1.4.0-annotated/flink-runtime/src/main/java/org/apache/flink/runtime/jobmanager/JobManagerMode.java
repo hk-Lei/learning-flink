@@ -20,6 +20,7 @@ package org.apache.flink.runtime.jobmanager;
 
 /**
  * The startup mode for the JobManager.
+ * JobManager 启动模式
  */
 public enum JobManagerMode {
 

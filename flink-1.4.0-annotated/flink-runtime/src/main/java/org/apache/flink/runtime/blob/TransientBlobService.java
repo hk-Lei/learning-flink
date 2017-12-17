@@ -35,7 +35,15 @@ import java.io.InputStream;
  * <p>Note: None of these BLOBs is highly available (HA). This case is covered by BLOBs in the
  * {@link PermanentBlobService}.
  *
+ * 检索在 BlobServer 中已经删除的临时二进制大对象 (BLOBS) 的服务
+ *
+ * <p>这可能包括例如：每个 Job 存储在 DistributedCache 的 blobs 文件
+ *
+ * <p>注意 : 这些 blobs 都不具有高可用性(HA)。需要高可用模式的 Blobs 会被覆盖在 PermanentBlobService 里。
+ *
  * <p>TODO: change API to not rely on local files but return {@link InputStream} objects
+ *
+ * <p>TODO: 改变 API 使其不依赖于本地文件，而是返回 InputStream 对象
  */
 public interface TransientBlobService extends Closeable {
 
@@ -46,6 +54,8 @@ public interface TransientBlobService extends Closeable {
 	/**
 	 * Returns the path to a local copy of the (job-unrelated) file associated with the provided
 	 * blob key.
+	 *
+	 * 返回 blob key 对应的(与 Job 无关的)文件的本地副本路径。
 	 *
 	 * @param key
 	 * 		blob key associated with the requested file

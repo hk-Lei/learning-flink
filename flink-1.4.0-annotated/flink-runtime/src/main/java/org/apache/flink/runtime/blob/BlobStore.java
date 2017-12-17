@@ -25,11 +25,13 @@ import java.io.IOException;
 
 /**
  * A blob store.
+ * Blob 存储
  */
 public interface BlobStore extends BlobView {
 
 	/**
 	 * Copies the local file to the blob store.
+	 * 将本地文件复制到 blob 存储。
 	 *
 	 * @param localFile The file to copy
 	 * @param jobId ID of the job this blob belongs to (or <tt>null</tt> if job-unrelated)
@@ -45,6 +47,10 @@ public interface BlobStore extends BlobView {
 	 *
 	 * <p>NOTE: This also tries to delete any created directories if empty.</p>
 	 *
+	 * 试图从存储中删除一个 blob。
+	 *
+	 * <p>注意 : 如果为空，也尝试删除创建的目录。</p>
+	 *
 	 * @param jobId ID of the job this blob belongs to (or <tt>null</tt> if job-unrelated)
 	 * @param blobKey The blob ID
 	 *
@@ -57,6 +63,10 @@ public interface BlobStore extends BlobView {
 	 * Tries to delete all blobs for the given job from storage.
 	 *
 	 * <p>NOTE: This also tries to delete any created directories if empty.</p>
+	 *
+	 * 试图从存储中删除指定作业的所有 blob。
+	 *
+	 * <p>注意 : 如果为空，也尝试删除创建的目录。</p>
 	 *
 	 * @param jobId The JobID part of all blobs to delete
 	 *
