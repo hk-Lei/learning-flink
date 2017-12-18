@@ -26,6 +26,10 @@ import org.apache.flink.annotation.PublicEvolving;
  *
  * <p>At sinks, the marker can be used to approximate the time a record needs to travel
  * through the dataflow.
+ *
+ * 特殊记录类型，它持有其在 Source 操作符中创建的时间戳、Source 操作符的 vertexId 和 其子任务的索引。
+ *
+ * <p>在 Sink 中，这个标记可以用来近似一个记录在数据流中穿行所需要的时间。
  */
 @PublicEvolving
 public final class LatencyMarker extends StreamElement {
@@ -33,6 +37,7 @@ public final class LatencyMarker extends StreamElement {
 	// ------------------------------------------------------------------------
 
 	/** The time the latency mark is denoting. */
+	/** 延迟标记表示的时间。 */
 	private final long markedTime;
 
 	private final int vertexID;

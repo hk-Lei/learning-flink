@@ -22,22 +22,29 @@ import org.apache.flink.annotation.Internal;
 /**
  * One value in a data stream. This stores the value and an optional associated timestamp.
  *
+ * 数据流中的元素对象，存储元素和可选的与其关联的 timestamp
+ *
  * @param <T> The type encapsulated with the stream record.
  */
 @Internal
 public final class StreamRecord<T> extends StreamElement {
 
 	/** The actual value held by this record. */
+	/** 记录所持有的真实元素。*/
 	private T value;
 
 	/** The timestamp of the record. */
+	/** 记录的时间戳。 */
 	private long timestamp;
 
 	/** Flag whether the timestamp is actually set. */
+	/** 标记是否设置了时间戳。 */
 	private boolean hasTimestamp;
 
 	/**
 	 * Creates a new StreamRecord. The record does not have a timestamp.
+	 *
+	 * 创建一个新的 StreamRecord 。该记录没有时间戳。
 	 */
 	public StreamRecord(T value) {
 		this.value = value;
@@ -46,6 +53,8 @@ public final class StreamRecord<T> extends StreamElement {
 	/**
 	 * Creates a new StreamRecord wrapping the given value. The timestamp is set to the
 	 * given timestamp.
+	 *
+	 * 创建一个包装给定值的新记录，包含了给定时间的时间戳。
 	 *
 	 * @param value The value to wrap in this {@link StreamRecord}
 	 * @param timestamp The timestamp in milliseconds
@@ -62,6 +71,8 @@ public final class StreamRecord<T> extends StreamElement {
 
 	/**
 	 * Returns the value wrapped in this stream value.
+	 *
+	 * 返回在这个流元素封装的值。
 	 */
 	public T getValue() {
 		return value;
@@ -69,6 +80,10 @@ public final class StreamRecord<T> extends StreamElement {
 
 	/**
 	 * Returns the timestamp associated with this stream value in milliseconds.
+	 *
+	 * 返回与此流元素相关联的时间戳，以毫秒为单位。
+	 *
+	 * 如果有则返回真实时间戳，如果没有则返回 Long 的最小值
 	 */
 	public long getTimestamp() {
 		if (hasTimestamp) {
@@ -82,6 +97,8 @@ public final class StreamRecord<T> extends StreamElement {
 	}
 
 	/** Checks whether this record has a timestamp.
+	 *
+	 * 检查这个记录是否有时间戳。
 	 *
  	 * @return True if the record has a timestamp, false if not.
 	 */
