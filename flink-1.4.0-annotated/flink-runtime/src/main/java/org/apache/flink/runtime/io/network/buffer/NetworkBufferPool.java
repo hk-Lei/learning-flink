@@ -46,6 +46,11 @@ import static org.apache.flink.util.Preconditions.checkNotNull;
  * The NetworkBufferPool creates {@link LocalBufferPool}s from which the individual tasks draw
  * the buffers for the network data transfer. When new local buffer pools are created, the
  * NetworkBufferPool dynamically redistributes the buffers between the pools.
+ *
+ * NetworkBufferPool 是一个用于网络堆栈的固定大小的 MemorySegment 实例池。
+ *
+ * NetworkBufferPool 创建 LocalBufferPool，用于任务的网络数据传输缓冲区。
+ * 当创建新的本地缓冲池时，NetworkBufferPool 将动态地重新分配池之间的缓冲区。
  */
 public class NetworkBufferPool implements BufferPoolFactory {
 
@@ -69,6 +74,8 @@ public class NetworkBufferPool implements BufferPoolFactory {
 
 	/**
 	 * Allocates all {@link MemorySegment} instances managed by this pool.
+	 *
+	 * 分配此 NetworkBufferPool 管理的所有 MemorySegment 实例。
 	 */
 	public NetworkBufferPool(int numberOfSegmentsToAllocate, int segmentSize, MemoryType memoryType) {
 		checkNotNull(memoryType);
@@ -133,6 +140,9 @@ public class NetworkBufferPool implements BufferPoolFactory {
 		// Adds the segment back to the queue, which does not immediately free the memory
 		// however, since this happens when references to the global pool are also released,
 		// making the availableMemorySegments queue and its contained object reclaimable
+
+		// 将该 MemorySegment 添加到队列中，但这并不能立即释放内存，
+		// 因为只有当对全局池的引用也被释放时，才会产生可用内存段队列及其包含的对象可重新声明的内容
 		availableMemorySegments.add(segment);
 	}
 

@@ -74,6 +74,9 @@ import org.apache.flink.streaming.runtime.tasks.StreamTask;
  * <p>Note that to notify downstream tasks that a source task is permanently closed and will no longer send any more
  * elements, the source should still send a {@link Watermark#MAX_WATERMARK} instead of {@link StreamStatus#IDLE}.
  * Stream Status elements only serve as markers for temporary status.
+ *
+ *
+ * 流状态元素
  */
 @Internal
 public final class StreamStatus extends StreamElement {

@@ -49,6 +49,9 @@ import static org.apache.flink.util.Preconditions.checkNotNull;
 /**
  * Network I/O components of each {@link TaskManager} instance. The network environment contains
  * the data structures that keep track of all intermediate results and all data exchanges.
+ *
+ * NetworkEnvironment 是每个 TaskManager 实例的网络 I/O 组件。
+ * NetworkEnvironment 包含跟踪所有中间结果和所有数据交换的数据结构。
  */
 public class NetworkEnvironment {
 
@@ -65,12 +68,15 @@ public class NetworkEnvironment {
 	private final TaskEventDispatcher taskEventDispatcher;
 
 	/** Server for {@link InternalKvState} requests. */
+	/** InternalKvState 请求的服务器 */
 	private KvStateServer kvStateServer;
 
 	/** Proxy for the queryable state client. */
+	/** 可查询的状态客户端代理 */
 	private KvStateClientProxy kvStateProxy;
 
 	/** Registry for {@link InternalKvState} instances. */
+	/** InternalKvState 实例注册表 */
 	private final KvStateRegistry kvStateRegistry;
 
 	private final IOManager.IOMode defaultIOMode;
@@ -80,9 +86,11 @@ public class NetworkEnvironment {
 	private final int partitionRequestMaxBackoff;
 
 	/** Number of network buffers to use for each outgoing/incoming channel (subpartition/input channel). */
+	/** 用于每个输入/输出通道(input channel/subpartition)的网络缓冲区的数量。 */
 	private final int networkBuffersPerChannel;
 
 	/** Number of extra network buffers to use for each outgoing/incoming gate (result partition/input gate). */
+	/** 每个输入输出 Gate (input gate/result partition)使用的额外网络缓冲区数量。 */
 	private final int extraNetworkBuffersPerGate;
 
 	private boolean isShutdown;

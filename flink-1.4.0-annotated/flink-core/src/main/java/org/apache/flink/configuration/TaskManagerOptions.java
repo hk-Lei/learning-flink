@@ -71,6 +71,8 @@ public class TaskManagerOptions {
 
 	/**
 	 * Size of memory buffers used by the network stack and the memory manager (in bytes).
+	 *
+	 * 网络堆栈和内存管理器使用的内存缓冲区大小(以字节为单位) 默认 32K。
 	 */
 	public static final ConfigOption<Integer> MEMORY_SEGMENT_SIZE =
 			key("taskmanager.memory.segment-size")
@@ -79,6 +81,9 @@ public class TaskManagerOptions {
 	/**
 	 * Amount of memory to be allocated by the task manager's memory manager (in megabytes). If not
 	 * set, a relative fraction will be allocated, as defined by {@link #MANAGED_MEMORY_FRACTION}.
+	 *
+	 * TaskManager 的内存管理器(以兆字节为单位)可分配的内存数量。
+	 * 如果没有设置，将分配一个相对占比，在 MANAGED_MEMORY_FRACTION 中定义。
 	 */
 	public static final ConfigOption<Long> MANAGED_MEMORY_SIZE =
 			key("taskmanager.memory.size")
@@ -87,6 +92,8 @@ public class TaskManagerOptions {
 	/**
 	 * Fraction of free memory allocated by the memory manager if {@link #MANAGED_MEMORY_SIZE} is
 	 * not set.
+	 *
+	 * 如果 MANAGED_MEMORY_SIZE 没有设置，内存管理器分配的空闲内存的相对占比，默认 70%
 	 */
 	public static final ConfigOption<Float> MANAGED_MEMORY_FRACTION =
 			key("taskmanager.memory.fraction")
@@ -95,6 +102,8 @@ public class TaskManagerOptions {
 	/**
 	 * Memory allocation method (JVM heap or off-heap), used for managed memory of the TaskManager
 	 * as well as the network buffers.
+	 *
+	 * 内存分配方法(JVM heap 或 off-heap)，用于管理 TaskManager 的内存和网络缓冲区。
 	 **/
 	public static final ConfigOption<Boolean> MEMORY_OFF_HEAP =
 			key("taskmanager.memory.off-heap")
@@ -102,6 +111,8 @@ public class TaskManagerOptions {
 
 	/**
 	 * Whether TaskManager managed memory should be pre-allocated when the TaskManager is starting.
+	 *
+	 * 当任务管理器启动时，是否预先分配 TaskManager 托管内存。
 	 */
 	public static final ConfigOption<Boolean> MANAGED_MEMORY_PRE_ALLOCATE =
 			key("taskmanager.memory.preallocate")
@@ -115,6 +126,9 @@ public class TaskManagerOptions {
 	 * Number of buffers used in the network stack. This defines the number of possible tasks and
 	 * shuffles.
 	 *
+	 * 已过期：
+	 * 在网络堆栈中使用的缓冲区的数目。这就定义了可能的任务 和 shuffles 的数量。
+	 *
 	 * @deprecated use {@link #NETWORK_BUFFERS_MEMORY_FRACTION}, {@link #NETWORK_BUFFERS_MEMORY_MIN},
 	 * and {@link #NETWORK_BUFFERS_MEMORY_MAX} instead
 	 */
@@ -125,6 +139,8 @@ public class TaskManagerOptions {
 
 	/**
 	 * Fraction of JVM memory to use for network buffers.
+	 *
+	 * 网络缓冲区使用的 JVM 内存占比，默认 10%
 	 */
 	public static final ConfigOption<Float> NETWORK_BUFFERS_MEMORY_FRACTION =
 			key("taskmanager.network.memory.fraction")
@@ -132,6 +148,8 @@ public class TaskManagerOptions {
 
 	/**
 	 * Minimum memory size for network buffers (in bytes)
+	 *
+	 * 网络缓冲区的最小内存大小(以字节为单位) 默认 64M
 	 */
 	public static final ConfigOption<Long> NETWORK_BUFFERS_MEMORY_MIN =
 			key("taskmanager.network.memory.min")
@@ -139,6 +157,8 @@ public class TaskManagerOptions {
 
 	/**
 	 * Maximum memory size for network buffers (in bytes)
+	 *
+	 * 网络缓冲区的最大内存大小(以字节为单位) 默认 1GB
 	 */
 	public static final ConfigOption<Long> NETWORK_BUFFERS_MEMORY_MAX =
 			key("taskmanager.network.memory.max")
@@ -148,6 +168,10 @@ public class TaskManagerOptions {
 	 * Number of network buffers to use for each outgoing/incoming channel (subpartition/input channel).
 	 *
 	 * Reasoning: 1 buffer for in-flight data in the subpartition + 1 buffer for parallel serialization
+	 *
+	 * 用于每个输入/输出通道(input channel/subpartition)的网络缓冲区的数量。
+	 *
+	 * 原因： 1 个用于分区的数据传输 + 1 个用于并行序列化
 	 */
 	public static final ConfigOption<Integer> NETWORK_BUFFERS_PER_CHANNEL =
 			key("taskmanager.network.memory.buffers-per-channel")
@@ -155,6 +179,8 @@ public class TaskManagerOptions {
 
 	/**
 	 * Number of extra network buffers to use for each outgoing/incoming gate (result partition/input gate).
+	 *
+	 * 每个输入输出 Gate (input gate/result partition)使用的额外网络缓冲区数量。
 	 */
 	public static final ConfigOption<Integer> NETWORK_EXTRA_BUFFERS_PER_GATE =
 			key("taskmanager.network.memory.floating-buffers-per-gate")
@@ -162,6 +188,8 @@ public class TaskManagerOptions {
 
 	/**
 	 * Minimum backoff for partition requests of input channels.
+	 *
+	 * 输入通道分区请求的最小容量。
 	 */
 	public static final ConfigOption<Integer> NETWORK_REQUEST_BACKOFF_INITIAL =
 			key("taskmanager.network.request-backoff.initial")
@@ -170,6 +198,8 @@ public class TaskManagerOptions {
 
 	/**
 	 * Maximum backoff for partition requests of input channels.
+	 *
+	 * 输入通道分区请求的最大容量。
 	 */
 	public static final ConfigOption<Integer> NETWORK_REQUEST_BACKOFF_MAX =
 			key("taskmanager.network.request-backoff.max")

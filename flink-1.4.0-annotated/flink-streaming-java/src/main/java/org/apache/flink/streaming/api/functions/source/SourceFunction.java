@@ -33,8 +33,6 @@ import java.io.Serializable;
  * is called with a {@link SourceContext} that can be used for emitting elements.
  * The run method can run for as long as necessary. The source must, however, react to an
  * invocation of {@link #cancel()} by breaking out of its main loop.
- * Flink 中所有流数据源的底层接口，流数据源必须遵循以下规则：
- *   + 当
  *
  * <h3>Checkpointed Sources</h3>
  *
@@ -85,6 +83,51 @@ import java.io.Serializable;
  * <p>When a source is stopped, the executing thread is not interrupted, but expected to leave the
  * {@link #run(SourceContext)} method in reasonable time on its own, preserving the atomicity
  * of state updates and element emission.
+ *
+ * Flink 中所有流数据源的基本接口。流数据源的规则如下: 当源开始下发元素时，执行带有 SourceContext 参数的 run 方法。
+ * 该方法可以在必要时一直运行（有数据就运行）。 但是，源必须能够跳出主循环来响应 cancel() 的调用。
+ *
+ * <h3> 支持 Checkpoint 的数据源</h3>
+ *
+ * <p> Source 也实现了 CheckpointedFunction（Checkpointed已过期）接口，必须确保状态检查点、内部状态的更新和元素的释放不能同时执行。
+ * 这是通过使用检查点锁对象来实现的，以保护同步块中元素的更新和释放。
+ *
+ * <p>这是在实现支持检查点源时应该遵循的基本模式:
+ *
+ * <pre>{@code
+ *  public class ExampleSource<T> implements SourceFunction<T>, CheckpointedFunction<Long> {
+ *      private long count = 0L;
+ *      private volatile boolean isRunning = true;
+ *
+ *      public void run(SourceContext<T> ctx) {
+ *          while (isRunning && count < 1000) {
+ *              synchronized (ctx.getCheckpointLock()) {
+ *                  ctx.collect(count);
+ *                  count++;
+ *              }
+ *          }
+ *      }
+ *
+ *      public void cancel() {
+ *          isRunning = false;
+ *      }
+ *
+ *      public Long snapshotState(long checkpointId, long checkpointTimestamp) { return count; }
+ *
+ *      public void initializeState(Long state) { this.count = state; }
+ *  }
+ * }</pre>
+ *
+ * <h3>Timestamps and watermarks:</h3>
+ *
+ * Source 可以为元素指定时间戳并手动提交 watermark，但这只有当流处理是基于 EventTime 时才执行，
+ * 基于其他时间例如 IngestionTime 和 ProcessingTime，Source 会忽略 watermarks
+ *
+ * <h3>优雅地停止</h3>
+ *
+ * 可以实现一个 StoppableFunction 接口。“停止” 与 “取消” 不同，停止是指优雅的退出：能够使状态和元素都保持一致的状态
+ *
+ * <p>当一个源被停止时，执行线程不会被中断，但期望在合理的时间内离开 run(SourceContext)方法，保持状态更新和元素释放的原子性。
  *
  * @param <T> The type of the elements produced by this source.
  *
@@ -153,7 +196,7 @@ public interface SourceFunction<T> extends Function, Serializable {
 
 	/**
 	 * Interface that source functions use to emit elements, and possibly watermarks.
-	 * SourceFunction 用来 emit 元素 (可能是 watermark) 的接口
+	 * SourceFunction 用来 emit 元素 (可能也有 watermark) 的接口
 	 *
 	 * @param <T> The type of the elements produced by the source.
 	 */
@@ -174,6 +217,8 @@ public interface SourceFunction<T> extends Function, Serializable {
 		 *         It needs to get a timestamp (via a {@link TimestampAssigner}) before any time-dependent
 		 *         operation (like time windows).</li>
 		 * </ul>
+		 *
+		 * 从 Source 下发一个元素，不附加时间戳。在大多数情况下，这是下发元素的默认方式。
 		 *
 		 * @param element The element to emit
 		 */
@@ -196,6 +241,8 @@ public interface SourceFunction<T> extends Function, Serializable {
 		 *     <li>On {@link TimeCharacteristic#EventTime}, the timestamp will be used.</li>
 		 * </ul>
 		 *
+		 * Source 下发一个元素并附加一个给定的时间戳
+		 *
 		 * @param element The element to emit
 		 * @param timestamp The timestamp in milliseconds since the Epoch
 		 */
@@ -211,6 +258,14 @@ public interface SourceFunction<T> extends Function, Serializable {
 		 * On {@link TimeCharacteristic#ProcessingTime},Watermarks will be ignored. On
 		 * {@link TimeCharacteristic#IngestionTime}, the Watermarks will be replaced by the
 		 * automatic ingestion time watermarks.
+		 *
+		 * 发出给定的 Watermark 。
+		 * 一个值为 t 的 watermark 表示：任何带有 timestamp t' <= t的元素都不应该发生。
+		 * 如果将来这样的元素被下发，这些元素会被认为是 <i> 迟到了 </i>。
+		 *
+		 * 这个方法只在运行在 EventTime 的情况下有效
+		 * 在 ProcessingTime 下，Watermark 是被忽略的
+		 * 在 IngestionTime 下，Watermark 将被自动摄入时间的 Watermark 所取代。
 		 *
 		 * @param mark The Watermark to emit
 		 */
@@ -228,6 +283,14 @@ public interface SourceFunction<T> extends Function, Serializable {
 		 * acknowledge themselves to be idle. The system will consider the source to resume activity
 		 * again once {@link SourceContext#collect(T)}, {@link SourceContext#collectWithTimestamp(T, long)},
 		 * or {@link SourceContext#emitWatermark(Watermark)} is called to emit elements or watermarks from the source.
+		 *
+		 * 标记 Source 暂时空闲，这就相当于告诉系统，这个源将暂时停止下发记录和 watermark 的时间是不确定的。
+		 * 只是对于 EventTime 或 IngestionTime 运行时有效，
+		 * 允许下游任务提前完成 Watermark ，无需在空闲时等待来自此 Source 的 Watermark 。
+		 *
+		 * Source 应该尽可能快的在他们处于空闲时就调用该方法，
+		 * 一旦 collect(T)、collectWithTimestamp(T,long) 或 emitWatermark(Watermark)} 方法被调用从源发出元素或 Watermark，
+		 * 系统将考虑重新激活的这个 Source。
 		 */
 		@PublicEvolving
 		void markAsTemporarilyIdle();
@@ -237,12 +300,16 @@ public interface SourceFunction<T> extends Function, Serializable {
 		 * {@link SourceFunction} for details about how to write a consistent checkpointed
 		 * source.
 		 *
+		 * 返回检查点的锁。请参阅 SourceFunction 中的注释，了解如何编写支持一致性检查点的 Source 代码。
+		 *
 		 * @return The object to use as the lock
 		 */
 		Object getCheckpointLock();
 
 		/**
 		 * This method is called by the system to shut down the context.
+		 *
+		 * 该方法被系统调用以关闭上下文。
 		 */
 		void close();
 	}

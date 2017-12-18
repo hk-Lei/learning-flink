@@ -31,6 +31,8 @@ import java.util.concurrent.ScheduledFuture;
 
 /**
  * Source contexts for various stream time characteristics.
+ *
+ * 各种流时间特性的 Source 上下文。
  */
 public class StreamSourceContexts {
 
@@ -42,7 +44,16 @@ public class StreamSourceContexts {
 	 *     <li>{@link TimeCharacteristic#ProcessingTime} = {@code NonTimestampContext}</li>
 	 *     <li>{@link TimeCharacteristic#EventTime} = {@code ManualWatermarkContext}</li>
 	 * </ul>
-	 * */
+	 *
+	 * 根据不同的时间特性，这个方法将返回适当的 SourceContext 对象：
+	 *
+	 * <ul>
+	 *     <li> IngestionTime : AutomaticWatermarkContext </li>
+	 *     <li> ProcessingTime : NonTimestampContext </li>
+	 *     <li> EventTime : ManualWatermarkContext </li>
+	 * </ul>
+	 *
+	 */
 	public static <OUT> SourceFunction.SourceContext<OUT> getSourceContext(
 			TimeCharacteristic timeCharacteristic,
 			ProcessingTimeService processingTimeService,
@@ -335,6 +346,16 @@ public class StreamSourceContexts {
 	 * between 2 consecutive checks, it determines the source to be IDLE and correspondingly
 	 * toggles the status. ACTIVE status resumes as soon as some record or watermark is collected
 	 * again.
+	 *
+	 * 与 Watermark 相关的流 Source 的上下文基础抽象类，实现 SourceFunction.SourceContext
+	 *
+	 * <p> 与 Watermark 相关的流 SourceContext 对象，负责把控当前的流状态 StreamStatus，从而达到将流状态正确地传播到下游。
+	 * 请参考 StreamStatus 的类注释，了解流状态如何影响下游任务的 Watermark 进展。
+	 *
+	 * <p> 这个类实现了空闲检查的逻辑。其在给定的时间间隔内触发空闲检查任务；
+	 * 如果在两个连续检查之间都没有收集到 Source 上下文的记录或 Watermark，则它将判定 Source 处于空闲状态并相应地切换状态。
+	 * 如果重新收集到了记录或者 Watermark，状态会被重新激活。
+	 *
 	 */
 	private abstract static class WatermarkContext<T> implements SourceFunction.SourceContext<T> {
 
@@ -351,15 +372,22 @@ public class StreamSourceContexts {
 		 *
 		 * <p>When the scheduled check is fired, if the flag remains to be {@code true}, the check
 		 * will fail, and our current status will determined to be IDLE.
+		 *
+		 * 每一次空闲检查开始时，这个标记会被重置为 true，当收集到记录或者 Watermark 时，会被置为 false
+		 *
+		 * <p>当下一次空闲检查被触发时，如果该标志仍然是 true，则检查将失败，Source 当前的状态判定为空闲。
 		 */
 		private volatile boolean failOnNextCheck;
 
 		/**
 		 * Create a watermark context.
 		 *
+		 * 创建一个 WatermarkContext 对象
+		 *
 		 * @param timeService the time service to schedule idleness detection tasks
 		 * @param checkpointLock the checkpoint lock
 		 * @param streamStatusMaintainer the stream status maintainer to toggle and retrieve current status
+		 *                               流状态保持器来切换和检索当前状态
 		 * @param idleTimeout (-1 if idleness checking is disabled)
 		 */
 		public WatermarkContext(
@@ -430,6 +458,7 @@ public class StreamSourceContexts {
 		@Override
 		public void markAsTemporarilyIdle() {
 			synchronized (checkpointLock) {
+				// 切换 Source 的当前状态
 				streamStatusMaintainer.toggleStreamStatus(StreamStatus.IDLE);
 			}
 		}
@@ -444,6 +473,7 @@ public class StreamSourceContexts {
 			cancelNextIdleDetectionTask();
 		}
 
+		//空闲检查任务
 		private class IdlenessDetectionTask implements ProcessingTimeCallback {
 			@Override
 			public void onProcessingTime(long timestamp) throws Exception {
@@ -451,8 +481,12 @@ public class StreamSourceContexts {
 					// set this to null now;
 					// the next idleness detection will be scheduled again
 					// depending on the below failOnNextCheck condition
+					// 此处设置 nextCheck 为 null
+					// 下一次的空闲检查将根据下面的 failOnNextCheck 条件再次调度
 					nextCheck = null;
 
+					// 这次检查时，如果 failOnNextCheck 还为 true 则判定为 空闲，切换 Source 流状态为空闲
+					// 如果 failOnNextCheck false 则设置下一次空闲检查任务
 					if (failOnNextCheck) {
 						markAsTemporarilyIdle();
 					} else {
@@ -465,6 +499,7 @@ public class StreamSourceContexts {
 		private void scheduleNextIdleDetectionTask() {
 			if (idleTimeout != -1) {
 				// reset flag; if it remains true when task fires, we have detected idleness
+				// 重置标记，如果当任务触发是该标记还是 true，那么我们判定为空闲状态
 				failOnNextCheck = true;
 				nextCheck = this.timeService.registerTimer(
 					this.timeService.getCurrentProcessingTime() + idleTimeout,
@@ -483,6 +518,8 @@ public class StreamSourceContexts {
 		//	Abstract methods for concrete subclasses to implement.
 		//  These methods are guaranteed to be synchronized on the checkpoint lock,
 		//  so implementations don't need to do so.
+		//
+		//  具体实现子类的抽象方法。这些方法已经保证了基于检查点锁的同步，所以实现时不再需要同步。
 		// ------------------------------------------------------------------------
 
 		/** Process and collect record. */
