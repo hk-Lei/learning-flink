@@ -24,16 +24,20 @@ import static org.apache.flink.configuration.ConfigOptions.key;
 
 /**
  * The set of configuration options relating to heartbeat manager settings.
+ *
+ * 与心跳管理者有关的配置项
  */
 @PublicEvolving
 public class HeartbeatManagerOptions {
 
 	/** Time interval for requesting heartbeat from sender side */
+	// 发送端请求心跳的时间间隔 默认 10s
 	public static final ConfigOption<Long> HEARTBEAT_INTERVAL =
 			key("heartbeat.interval")
 			.defaultValue(10000L);
 
 	/** Timeout for requesting and receiving heartbeat for both sender and receiver sides */
+	// 发送端请求心跳和接收端接收心跳的超时时间 默认 50s
 	public static final ConfigOption<Long> HEARTBEAT_TIMEOUT =
 			key("heartbeat.timeout")
 			.defaultValue(50000L);

@@ -34,7 +34,10 @@ import java.io.Serializable;
 /**
  * {@link RetrievableStateStorageHelper} implementation which stores the state in the given filesystem path.
  *
+ * RetrievableStateStorageHelper 的实现类，存储状态在给定文件系统的路径。
+ *
  * @param <T> The type of the data that can be stored by this storage helper.
+ *           可以由该 Storage Helper 存储的数据类型。
  */
 public class FileSystemStateStorageHelper<T extends Serializable> implements RetrievableStateStorageHelper<T> {
 
@@ -59,9 +62,11 @@ public class FileSystemStateStorageHelper<T extends Serializable> implements Ret
 	public RetrievableStateHandle<T> store(T state) throws Exception {
 		Exception latestException = null;
 
+		// 尝试 10 次
 		for (int attempt = 0; attempt < 10; attempt++) {
 			Path filePath = getNewFilePath();
 
+			// 写 state 到文件系统
 			try (FSDataOutputStream outStream = fs.create(filePath, FileSystem.WriteMode.NO_OVERWRITE)) {
 				InstantiationUtil.serializeObject(outStream, state);
 				return new RetrievableStreamStateHandle<T>(filePath, outStream.getPos());

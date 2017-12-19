@@ -31,6 +31,15 @@ import java.util.concurrent.CompletableFuture;
  *     <li>Payload reports of incoming heartbeats</li>
  *     <li>Retrieval of payloads for outgoing heartbeats</li>
  * </ul>
+ *
+ * 与 HeartbeatManager 交互的接口。心跳监听器用于以下事项:
+ *
+ * <ul>
+ *     <li>通知心跳超时</li>
+ *     <li>输入心跳的负载报告</li>
+ *     <li>输出心跳的负载检索</li>
+ * </ul>
+ *
  * @param <I> Type of the incoming payload
  * @param <O> Type of the outgoing payload
  */
@@ -40,6 +49,8 @@ public interface HeartbeatListener<I, O> {
 	 * Callback which is called if a heartbeat for the machine identified by the given resource
 	 * ID times out.
 	 *
+	 * 如果给定资源 id 的机器心跳超时时，调用该回调方法
+	 *
 	 * @param resourceID Resource ID of the machine whose heartbeat has timed out
 	 */
 	void notifyHeartbeatTimeout(ResourceID resourceID);
@@ -47,6 +58,8 @@ public interface HeartbeatListener<I, O> {
 	/**
 	 * Callback which is called whenever a heartbeat with an associated payload is received. The
 	 * carried payload is given to this method.
+	 *
+	 * 当收到给定资源 id 的机器带有有效负荷的心跳信息时，调用该回调方法
 	 *
 	 * @param resourceID Resource ID identifying the sender of the payload
 	 * @param payload Payload of the received heartbeat
@@ -56,6 +69,8 @@ public interface HeartbeatListener<I, O> {
 	/**
 	 * Retrieves the payload value for the next heartbeat message. Since the operation can happen
 	 * asynchronously, the result is returned wrapped in a future.
+	 *
+	 * 检索下一个 heartbeat 消息的有效负载值。由于操作可以异步发生，结果将在将来被打包返回。
 	 *
 	 * @return Future containing the next payload for heartbeats
 	 */

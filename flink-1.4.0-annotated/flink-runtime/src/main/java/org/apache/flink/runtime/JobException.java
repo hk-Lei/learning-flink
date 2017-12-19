@@ -22,6 +22,8 @@ import org.apache.flink.util.FlinkException;
 
 /**
  * Indicates that a job has failed.
+ *
+ * 代表 Job 已经失败了
  */
 public class JobException extends FlinkException {
 

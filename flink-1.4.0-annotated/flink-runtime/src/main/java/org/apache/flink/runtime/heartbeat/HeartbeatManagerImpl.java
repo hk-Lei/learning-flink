@@ -132,6 +132,7 @@ public class HeartbeatManagerImpl<I, O> implements HeartbeatManager<I, O> {
 					heartbeatMonitor);
 
 				// check if we have stopped in the meantime (concurrent stop operation)
+				// 检查我们是否在同时停止(同时停止操作)
 				if (stopped) {
 					heartbeatMonitor.cancel();
 

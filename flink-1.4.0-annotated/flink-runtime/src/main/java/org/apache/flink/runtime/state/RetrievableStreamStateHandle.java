@@ -33,6 +33,10 @@ import java.io.Serializable;
  * This implementation expects that the object was serialized through default serialization of Java's
  * {@link java.io.ObjectOutputStream}.
  *
+ * 封装了一个 StreamStateHandle ，使被引用的 state 对象通过 get 方法就可以被检索到
+ *
+ * 这个实现期望该对象能够通过 Java ObjectOutputStream 默认的序列化机制序列化
+ *
  * @param <T> type of the retrievable object which is stored under the wrapped stream handle
  */
 public class RetrievableStreamStateHandle<T extends Serializable> implements

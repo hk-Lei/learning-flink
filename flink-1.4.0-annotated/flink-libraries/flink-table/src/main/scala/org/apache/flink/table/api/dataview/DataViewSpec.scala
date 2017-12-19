@@ -26,6 +26,8 @@ import org.apache.flink.table.dataview.{ListViewTypeInfo, MapViewTypeInfo}
 /**
   * Data view specification.
   *
+  * 数据视图的说明。
+  *
   * @tparam ACC type extends [[DataView]]
   */
 trait DataViewSpec[ACC <: DataView] {
@@ -34,6 +36,14 @@ trait DataViewSpec[ACC <: DataView] {
   def toStateDescriptor: StateDescriptor[_ <: State, _]
 }
 
+/**
+  * ListView 的说明
+  *
+  * @param stateId
+  * @param field
+  * @param listViewTypeInfo
+  * @tparam T
+  */
 case class ListViewSpec[T](
     stateId: String,
     field: Field,
@@ -44,6 +54,15 @@ case class ListViewSpec[T](
     new ListStateDescriptor[T](stateId, listViewTypeInfo.elementType)
 }
 
+/**
+  * MapView 的说明
+  *
+  * @param stateId
+  * @param field
+  * @param mapViewTypeInfo
+  * @tparam K
+  * @tparam V
+  */
 case class MapViewSpec[K, V](
     stateId: String,
     field: Field,

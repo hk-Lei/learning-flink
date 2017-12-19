@@ -44,6 +44,8 @@ import java.util.UUID;
 /**
  * Simple wrapper for ZooKeeper's {@link QuorumPeer}, which reads a ZooKeeper config file and writes
  * the required 'myid' file before starting the peer.
+ *
+ * ZooKeeper 的 QuorumPeer 的简单包装器，它读取 ZooKeeper 配置文件并在开始该节点之前写入所需的 “myid” 文件。
  */
 public class FlinkZooKeeperQuorumPeer {
 

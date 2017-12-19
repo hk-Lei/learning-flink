@@ -24,6 +24,11 @@ package org.apache.flink.table.api.dataview
   *
   * Depending on the context in which the [[org.apache.flink.table.functions.AggregateFunction]] is
   * used, a [[DataView]] can be backed by a Java heap collection or a state backend.
+  *
+  * DataView 是一个集合类型用于 AggregateFunction 的累加器
+  *
+  * 根据 AggregateFunction 具体的使用情况，DataView 后端会有 Java 堆集合或者 State 后端支持
+  *
   */
 trait DataView extends Serializable {
 

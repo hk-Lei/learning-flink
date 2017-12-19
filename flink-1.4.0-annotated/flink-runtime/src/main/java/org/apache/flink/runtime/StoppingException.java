@@ -22,6 +22,8 @@ import org.apache.flink.util.FlinkException;
 
 /**
  * Indicates that a job is not stoppable.
+ *
+ * 表示 Job 是不可停止的，即停止时抛出该异常
  */
 public class StoppingException extends FlinkException {
 

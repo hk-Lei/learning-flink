@@ -50,6 +50,8 @@ public final class FileUtils {
 	/**
 	 * Constructs a random filename with the given prefix and
 	 * a random part generated from hex characters.
+	 *
+	 * 用给定的前缀构造一个随机文件名，从十六进制字符中生成随机的部分，默认 12 位随机部分。
 	 * 
 	 * @param prefix
 	 *        the prefix to the filename to be constructed
