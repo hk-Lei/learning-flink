@@ -20,6 +20,8 @@ package org.apache.flink.runtime.iterative.task;
 
 /**
  * Models the functionality that the termination of an iterative task can be requested from outside.
+ *
+ * 可以从外部请求终止迭代任务。
  */
 public interface Terminable {
 

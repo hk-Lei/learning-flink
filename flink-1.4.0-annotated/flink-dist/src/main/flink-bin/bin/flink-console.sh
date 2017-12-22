@@ -19,6 +19,8 @@
 
 # Start a Flink service as a console application. Must be stopped with Ctrl-C
 # or with SIGTERM by kill or the controlling process.
+
+# 启动一个 Flink 服务作为控制台应用程序。必须使用 Ctrl-C 停止 或者使用 信号 kill 或 控制进程
 USAGE="Usage: flink-console.sh (jobmanager|taskmanager|zookeeper) [args]"
 
 SERVICE=$1

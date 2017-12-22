@@ -39,6 +39,9 @@ import java.util.Optional;
  * Dispatcher implementation which spawns a {@link JobMaster} for each
  * submitted {@link JobGraph} within in the same process. This dispatcher
  * can be used as the default for all different session clusters.
+ *
+ * Dispatcher 实现在同一进程中为提交的每个 JobGraph 提供一个 JobMaster。
+ * 这个 Dispatcher 可以作为所有不同会话集群的默认选择。
  */
 public class StandaloneDispatcher extends Dispatcher {
 	public StandaloneDispatcher(

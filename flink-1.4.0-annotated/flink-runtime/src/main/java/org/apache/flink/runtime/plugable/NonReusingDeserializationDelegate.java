@@ -26,6 +26,9 @@ import java.io.IOException;
 
 /**
  * A {@link DeserializationDelegate} that always creates a new instance upon deserialization.
+ *
+ * 不可重用的反序列化委托
+ *
  */
 public class NonReusingDeserializationDelegate<T> implements DeserializationDelegate<T> {
 

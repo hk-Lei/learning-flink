@@ -1912,6 +1912,7 @@ object JobManager {
     // startup checks and logging
     // 启动时检查、打印日志
     EnvironmentInformation.logEnvironmentInfo(LOG.logger, "JobManager", args)
+    // 注册系统的信号处理器
     SignalHandler.register(LOG.logger)
     JvmShutdownSafeguard.installAsShutdownHook(LOG.logger)
 
@@ -1958,6 +1959,7 @@ object JobManager {
     }
 
     // run the job manager
+    // 加载安全模块配置
     SecurityUtils.install(new SecurityConfiguration(configuration))
 
     try {
@@ -1965,7 +1967,7 @@ object JobManager {
         override def call(): Unit = {
           runJobManager(
             configuration,
-            executionMode,
+            executionMode, // Cluster Or Local
             externalHostName,
             portRange)
         }
@@ -1983,6 +1985,8 @@ object JobManager {
    * dedicated actor system for the JobManager. Second, its starts all components of the
    * JobManager (including library cache, instance manager, scheduler). Finally, it starts
    * the JobManager actor itself.
+   *
+   * 启动并运行 JobManager 及其所有组件
    *
    * This method blocks indefinitely (or until the JobManager's actor system is shut down).
    *
@@ -2088,6 +2092,8 @@ object JobManager {
     * Starts and runs the JobManager with all its components trying to bind to
     * a port in the specified range.
     *
+    * 启动 JobManager 并将其所有组件绑定到指定范围的端口上
+    *
     * @param configuration The configuration object for the JobManager.
     * @param executionMode The execution mode in which to run. Execution mode LOCAL will spawn an
     *                      an additional TaskManager in the same process.
@@ -2103,12 +2109,14 @@ object JobManager {
 
     val result = AkkaUtils.retryOnBindException({
       // Try all ports in the range until successful
+      // 尝试在范围内所有端口，直到成功为止
       val socket = NetUtils.createSocketFromPorts(
         listeningPortRange,
         new NetUtils.SocketFactory {
           override def createSocket(port: Int): ServerSocket = new ServerSocket(
             // Use the correct listening address, bound ports will only be
             // detected later by Akka.
+            // 使用正确的监听地址，稍后由 Akka 检测绑定的端口。
             port, 0, InetAddress.getByName(NetUtils.getWildcardIPAddress))
         })
 

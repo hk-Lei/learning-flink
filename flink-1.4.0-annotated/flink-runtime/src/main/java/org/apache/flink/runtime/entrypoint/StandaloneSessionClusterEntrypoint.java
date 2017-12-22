@@ -37,6 +37,8 @@ import org.apache.flink.runtime.util.SignalHandler;
 
 /**
  * Entry point for the standalone session cluster.
+ *
+ * 独立会话集群的入口
  */
 public class StandaloneSessionClusterEntrypoint extends SessionClusterEntrypoint {
 

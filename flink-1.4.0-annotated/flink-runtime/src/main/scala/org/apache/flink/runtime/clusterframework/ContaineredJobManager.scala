@@ -46,6 +46,10 @@ import scala.language.postfixOps
   * It enriches the [[JobManager]] with additional messages
   * to start/administer/stop the session.
   *
+  * 运行在 Yarn 或者 Mesos 上的 JobManager Actor
+  *
+  * 通过附加的消息来启动、管理、停止会话，增强了 JobManager
+  *
   * @param flinkConfiguration Configuration object for the actor
   * @param futureExecutor Execution context which is used to execute concurrent tasks in the
   *                         [[org.apache.flink.runtime.executiongraph.ExecutionGraph]]
@@ -98,6 +102,8 @@ abstract class ContaineredJobManager(
   val jobPollingInterval: FiniteDuration
 
   // indicates if this JM has been started in a dedicated (per-job) mode.
+
+  // 表示此 JM 是否以专用(每个 job)模式启动。
   var stopWhenJobFinished: JobID = null
 
   override def handleMessage: Receive = {

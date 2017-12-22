@@ -556,11 +556,16 @@ abstract class TableEnvironment(val config: TableConfig) {
     val planner = new FlinkPlannerImpl(getFrameworkConfig, getPlanner, getTypeFactory)
     // parse the sql query
     val parsed = planner.parse(query)
+
+//    println("Parsed the SQL Query: " + parsed)
     if (null != parsed && parsed.getKind.belongsTo(SqlKind.QUERY)) {
       // validate the sql query
       val validated = planner.validate(parsed)
+
+//      println("Validated the SQL Query: " + validated)
       // transform to a relational tree
       val relational = planner.rel(validated)
+//      println("Transform to a Relational Tree : " + relational)
       new Table(this, LogicalRelNode(relational.rel))
     } else {
       throw new TableException(

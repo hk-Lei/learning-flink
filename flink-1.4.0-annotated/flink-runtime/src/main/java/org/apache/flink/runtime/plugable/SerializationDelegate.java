@@ -29,6 +29,8 @@ import java.io.IOException;
  * The serialization delegate exposes an arbitrary element as a {@link IOReadableWritable} for
  * serialization, with the help of a type serializer.
  *
+ * 序列化委托
+ *
  * @param <T> The type to be represented as an IOReadableWritable.
  */
 public class SerializationDelegate<T> implements IOReadableWritable {

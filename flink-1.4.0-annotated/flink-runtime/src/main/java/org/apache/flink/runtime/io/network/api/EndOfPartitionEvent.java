@@ -24,6 +24,8 @@ import org.apache.flink.runtime.event.RuntimeEvent;
 
 /**
  * This event marks a subpartition as fully consumed.
+ *
+ * 这个事件标记了一个子分区被完全消费完了
  */
 public class EndOfPartitionEvent extends RuntimeEvent {
 

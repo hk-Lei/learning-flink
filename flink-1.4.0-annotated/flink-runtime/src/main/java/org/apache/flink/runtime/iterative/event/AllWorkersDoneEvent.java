@@ -25,6 +25,8 @@ import java.util.Map;
 /**
  * Event sent by the {@code IterationSynchronizationSinkTask} to each
  * {@code IterationHead} signaling to start a new superstep.
+ *
+ * IterationSynchronizationSinkTask 发送的事件到每个 IterationHead 表示开始新的 superstep 信号。
  */
 public class AllWorkersDoneEvent extends IterationEventWithAggregators {
 

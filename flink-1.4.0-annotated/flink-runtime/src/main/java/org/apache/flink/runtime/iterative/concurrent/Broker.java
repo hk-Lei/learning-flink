@@ -25,6 +25,8 @@ import java.util.concurrent.ConcurrentMap;
 
 /**
  * A concurrent data structure that allows the hand-over of an object between a pair of threads.
+ *
+ * 一个并发的数据结构，允许在两个线程之间移交一个对象。
  */
 public class Broker<V> {
 
@@ -32,6 +34,8 @@ public class Broker<V> {
 
 	/**
 	 * Hand in the object to share.
+	 *
+	 * 持有可共享的对象
 	 */
 	public void handIn(String key, V obj) {
 		if (!retrieveSharedQueue(key).offer(obj)) {
@@ -71,6 +75,8 @@ public class Broker<V> {
 
 	/**
 	 * Thread-safe call to get a shared {@link BlockingQueue}.
+	 *
+	 * 线程安全的调用获得一个共享 BlockingQueue
 	 */
 	private BlockingQueue<V> retrieveSharedQueue(String key) {
 		BlockingQueue<V> queue = mediations.get(key);

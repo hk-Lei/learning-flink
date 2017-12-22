@@ -26,6 +26,9 @@ import java.io.IOException;
 
 /**
  * A {@link DeserializationDelegate} that reuses an existing instance upon deserialization.
+ *
+ * 可重用的反序列化的委托
+ *
  */
 public class ReusingDeserializationDelegate<T> implements DeserializationDelegate<T> {
 

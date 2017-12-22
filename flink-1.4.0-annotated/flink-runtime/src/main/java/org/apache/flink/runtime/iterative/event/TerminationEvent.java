@@ -26,6 +26,8 @@ import java.io.IOException;
 
 /**
  * Signals that the iteration is completely executed, participating tasks must terminate now.
+ *
+ * 表示迭代执行已完全的信号，现在必须终止相应的 Tasks。
  */
 public class TerminationEvent extends TaskEvent {
 

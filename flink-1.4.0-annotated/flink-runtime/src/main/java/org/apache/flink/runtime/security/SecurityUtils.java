@@ -34,6 +34,11 @@ import java.util.List;
  * 1. Java Authentication and Authorization Service (JAAS)
  * 2. Hadoop's User Group Information (UGI)
  * 3. ZooKeeper's process-wide security settings.
+ *
+ * 安全配置的工具类，支持以下的安全子系统：
+ * 1. Java 认证和授权服务 (JAAS)
+ * 2. Hadoop 的用户组信息 (UGI)
+ * 3. Zookeeper 进程基本的安全配置
  */
 public class SecurityUtils {
 
@@ -55,7 +60,11 @@ public class SecurityUtils {
 	/**
 	 * Installs a process-wide security configuration.
 	 *
+	 * 加载进程安全配置
+	 *
 	 * <p>Applies the configuration using the available security modules (i.e. Hadoop, JAAS).
+	 *
+	 * <p>配置可用的安全模块（如 Hadoop、JAAS）
 	 */
 	public static void install(SecurityConfiguration config) throws Exception {
 
@@ -77,6 +86,7 @@ public class SecurityUtils {
 		installedModules = modules;
 
 		// First check if we have Hadoop in the ClassPath. If not, we simply don't do anything.
+		// 首先检查在 ClassPath 中是否有Hadoop。如果没有，我们就什么都不做。
 		try {
 			Class.forName(
 				"org.apache.hadoop.security.UserGroupInformation",
@@ -85,8 +95,11 @@ public class SecurityUtils {
 
 			// install a security context
 			// use the Hadoop login user as the subject of the installed security context
+			//
+			// 安装一个安全上下文
+			// 使用 Hadoop 登录用户作为已安装安全上下文的表现对象
 			if (!(installedContext instanceof NoOpSecurityContext)) {
-				LOG.warn("overriding previous security context");
+				LOG.warn("overriding previous security context / 覆盖之前的安全上下文");
 			}
 			UserGroupInformation loginUser = UserGroupInformation.getLoginUser();
 			installedContext = new HadoopSecurityContext(loginUser);

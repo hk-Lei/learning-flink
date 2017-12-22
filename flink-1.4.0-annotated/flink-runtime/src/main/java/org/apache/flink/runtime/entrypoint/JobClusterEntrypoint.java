@@ -39,6 +39,8 @@ import org.apache.flink.util.Preconditions;
 
 /**
  * Base class for per-job cluster entry points.
+ *
+ * 单作业集群入口基类 ： Yarn 或者 Mesos
  */
 public abstract class JobClusterEntrypoint extends ClusterEntrypoint {
 

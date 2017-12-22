@@ -20,5 +20,7 @@ package org.apache.flink.runtime.event;
 
 /**
  * Subclasses of this event are recognized as events exchanged by the core runtime.
+ *
+ * 该类的实现类是用于核心运行时的交换的事件
  */
 public abstract class RuntimeEvent extends AbstractEvent {}

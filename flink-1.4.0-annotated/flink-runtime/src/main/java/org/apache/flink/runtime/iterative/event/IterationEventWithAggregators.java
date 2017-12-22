@@ -34,6 +34,8 @@ import java.util.Map;
 
 /**
  * Base class for iteration {@link TaskEvent} transmitting operator aggregators.
+ *
+ * 迭代的 TaskEvent 基类，可以发送操作符聚合器。
  */
 public abstract class IterationEventWithAggregators extends TaskEvent {
 

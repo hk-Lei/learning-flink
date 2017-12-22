@@ -21,6 +21,8 @@ package org.apache.flink.runtime.akka;
 /**
  * Defines the listening behaviour of the JobClientActor and thus the messages
  * which are sent from the JobManger to the JobClientActor.
+ *
+ * 定义 JobClientActor 的监听行为
  */
 public enum ListeningBehaviour {
 	DETACHED, // only receive the Acknowledge message about the job submission message

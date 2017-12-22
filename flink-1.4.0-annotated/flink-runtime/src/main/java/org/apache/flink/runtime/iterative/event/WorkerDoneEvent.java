@@ -29,6 +29,8 @@ import java.util.Map;
 /**
  * Completion event sent from each {@code IterationHead} to the
  * {@code IterationSynchronizationSinkTask}.
+ *
+ * 每个 IterationHead 发送到 IterationSynchronizationSinkTask 的完成事件
  */
 public class WorkerDoneEvent extends IterationEventWithAggregators {
 

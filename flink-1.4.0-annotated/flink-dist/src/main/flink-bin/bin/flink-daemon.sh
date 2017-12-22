@@ -18,11 +18,12 @@
 ################################################################################
 
 # Start/stop a Flink daemon.
+# 启动或者停止 Flink 的进程
 USAGE="Usage: flink-daemon.sh (start|stop|stop-all) (jobmanager|taskmanager|zookeeper|historyserver) [args]"
 
 STARTSTOP=$1
 DAEMON=$2
-ARGS=("${@:3}") # get remaining arguments as array
+ARGS=("${@:3}") # get remaining arguments as array 将剩下的参数作为一个数组
 
 bin=`dirname "$0"`
 bin=`cd "$bin"; pwd`

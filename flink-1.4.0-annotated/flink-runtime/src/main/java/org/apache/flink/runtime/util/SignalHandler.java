@@ -24,6 +24,7 @@ import sun.misc.Signal;
 
 /**
  * This signal handler / signal logger is based on Apache Hadoop's org.apache.hadoop.util.SignalLogger.
+ *
  * 这个信号处理器/信号记录器是基于 Apache Hadoop 的org.apache.hadoop.util.SignalLogger。
  */
 public class SignalHandler {
@@ -89,6 +90,8 @@ public class SignalHandler {
 				}
 			}
 			bld.append("]");
+			// 如果不是 Windows 系统 : Registered UNIX signal handlers for [TERM, HUP, INT]
+			// 如果是 Windows 系统 : Registered UNIX signal handlers for [TERM, INT]
 			LOG.info(bld.toString());
 		}
 	}
