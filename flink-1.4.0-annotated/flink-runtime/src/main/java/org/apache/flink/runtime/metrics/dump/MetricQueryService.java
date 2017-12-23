@@ -161,6 +161,8 @@ public class MetricQueryService extends UntypedActor {
 	/**
 	 * Starts the MetricQueryService actor in the given actor system.
 	 *
+	 * 在给定的 Actor 系统中启动 MetricQueryService actor。
+	 *
 	 * @param actorSystem The actor system running the MetricQueryService
 	 * @param resourceID resource ID to disambiguate the actor name
 	 * @return actor reference to the MetricQueryService

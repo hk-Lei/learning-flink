@@ -96,6 +96,8 @@ object AkkaUtils {
 
   /**
    * Creates an actor system with the given akka config.
+    *
+    * 使用给定的 akka 配置创建一个 Actor 系统。
    *
    * @param akkaConfig configuration for the actor system
    * @return created actor system
@@ -730,6 +732,8 @@ object AkkaUtils {
 
   /**
     * Retries a function if it fails because of a [[java.net.BindException]].
+    *
+    * 如果因为 java.net.BindException 异常导致失败就重试
     *
     * @param fn The function to retry
     * @param stopCond Flag to signal termination

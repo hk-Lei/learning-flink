@@ -20,6 +20,8 @@ package org.apache.flink.runtime.webmonitor;
 
 /**
  * Interface for web monitors. Defines life-cycle methods and properties.
+ *
+ * 网络监控接口。定义生命周期方法和属性。
  */
 public interface WebMonitor {
 

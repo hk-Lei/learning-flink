@@ -39,6 +39,15 @@ import static org.apache.flink.util.Preconditions.checkNotNull;
  * 
  * <p>All threads created by this factory are daemon threads and have the default (normal)
  * priority.
+ *
+ * 用于关键线程池的线程工厂类，这里的关键线程池指 Flink 的核心协调器及工作线程，其不能容忍任何不起眼的错误
+ *
+ * <p> 该线程工厂给线程提供了一个 UncaughtExceptionHandler（异常处理者），如果该异常处理者没有显示的给出，
+ * 默认的异常处理者将记录异常日志，然后终止进程。这保证了关键异常信息不会丢失，系统不会运行在不一致的状态。
+ *
+ * <p> 该工厂创建的线程为 "(pool-name)-thread-n", (pool-name) 是可配置的，n 是一个递增的数字
+ *
+ * <p> 该工厂创建的所有线程都是守护线程，并具有缺省(正常)优先级。
  */
 public class ExecutorThreadFactory implements ThreadFactory {
 

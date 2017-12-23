@@ -62,6 +62,8 @@ import scala.concurrent.duration.FiniteDuration;
 /**
  * Tools for starting JobManager and TaskManager processes, including the
  * Actor Systems used to run the JobManager and TaskManager actors.
+ *
+ * 用于启动 JobManager 和 TaskManager 进程的工具类，包括用于运行 JobManager 和 TaskManager 的 Actor 系统。
  */
 public class BootstrapTools {
 	private static final Logger LOG = LoggerFactory.getLogger(BootstrapTools.class);

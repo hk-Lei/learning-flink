@@ -70,9 +70,16 @@ public class HighAvailabilityServicesUtils {
 		Executor executor,
 		AddressResolution addressResolution) throws Exception {
 
+		// 获取配置的 high-availability 模式，NONE 或者 ZOOKEEPER
 		HighAvailabilityMode highAvailabilityMode = LeaderRetrievalUtils.getRecoveryMode(configuration);
 
 		switch(highAvailabilityMode) {
+			// 如果 HA 模式为 NONE：
+			// 1. 获取 JobManager 的 hostname 和 port
+			// 2. 创建 JobManager 的 rpc 服务 url
+			// 3. 创建 ResourceManager 的 rpc 服务 url
+			// 4. 创建 Dispatcher 调度程序的 rpc 服务 url
+			// 5. 根据生成的上述 3 个 rpc url 创建独立集群模式下的 HA 服务对象 StandaloneHaServices
 			case NONE:
 				final Tuple2<String, Integer> hostnamePort = getJobManagerAddress(configuration);
 
@@ -99,6 +106,9 @@ public class HighAvailabilityServicesUtils {
 					resourceManagerRpcUrl,
 					dispatcherRpcUrl,
 					jobManagerRpcUrl);
+			// 如果 HA 模式为 ZOOKEEPER：
+			// 1. 创建 Blob Store 服务
+			// 2. 创建 Zookeeper HA 模式下的 HA 服务对象 ZooKeeperHaServices
 			case ZOOKEEPER:
 				BlobStoreService blobStoreService = BlobUtils.createBlobStoreFromConfig(configuration);
 

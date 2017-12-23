@@ -36,6 +36,8 @@ import org.slf4j.LoggerFactory;
 
 /**
  * Convenience class to extract hardware specifics of the computer executing the running JVM.
+ *
+ * 用于提取运行 JVM 机器的硬件信息的工具类
  */
 public class Hardware {
 

@@ -1897,6 +1897,8 @@ object JobManager {
 
   val LOG = Logger(classOf[JobManager])
 
+  // 启动时失败使用 System.exit(1);
+  // 运行时失败使用 System.exit(2);
   val STARTUP_FAILURE_RETURN_CODE = 1
   val RUNTIME_FAILURE_RETURN_CODE = 2
 
@@ -1936,6 +1938,8 @@ object JobManager {
     // we want to check that the JobManager hostname is in the config
     // if it is not in there, the actor system will bind to the loopback interface's
     // address and will not be reachable from anyone remote
+
+    // 我们需要检查一下 JobManager 主机名是否在配置中，如果不在则 Actor 系统讲绑定回环地址，将不能从远程访问
     if (externalHostName == null) {
       val message = "Config parameter '" + JobManagerOptions.ADDRESS.key() +
         "' is missing (hostname/address to bind JobManager to)."
@@ -1986,7 +1990,10 @@ object JobManager {
    * JobManager (including library cache, instance manager, scheduler). Finally, it starts
    * the JobManager actor itself.
    *
-   * 启动并运行 JobManager 及其所有组件
+   * 启动并运行 JobManager 及其所有组件:
+    * 首先，该方法为 JobManager 启动了一个专用的 Actor 系统
+    * 其次，它启动了 JobManager 的所有组件（包括库缓存、实例管理器、调度器）
+    * 最后，它启动了 JobManager 自身的 Actor。
    *
    * This method blocks indefinitely (or until the JobManager's actor system is shut down).
    *
@@ -2005,10 +2012,12 @@ object JobManager {
 
     val numberProcessors = Hardware.getNumberCPUCores()
 
+    // 创建 jobmanager-future 线程池
     val futureExecutor = Executors.newScheduledThreadPool(
       numberProcessors,
       new ExecutorThreadFactory("jobmanager-future"))
 
+    // 创建 jobmanager-io 线程池
     val ioExecutor = Executors.newFixedThreadPool(
       numberProcessors,
       new ExecutorThreadFactory("jobmanager-io"))
@@ -2017,21 +2026,29 @@ object JobManager {
 
     // we have to first start the JobManager ActorSystem because this determines the port if 0
     // was chosen before. The method startActorSystem will update the configuration correspondingly.
+
+    // 我们必须首先启动 JobManager ActorSystem，因为如果它将决定端口。startActorSystem 方法将更新相应地配置。
     val jobManagerSystem = startActorSystem(
       configuration,
       listeningAddress,
       listeningPort)
 
+    // 创建 HA 服务
     val highAvailabilityServices = HighAvailabilityServicesUtils.createHighAvailabilityServices(
       configuration,
       ioExecutor,
       AddressResolution.NO_ADDRESS_RESOLUTION)
 
+    // 创建一个 MetricRegistry ，并启动配置的 reporter。
     val metricRegistry = new MetricRegistryImpl(
       MetricRegistryConfiguration.fromConfiguration(configuration))
 
+    // 初始化 MetricQueryService
+    // 1. 启动 MetricQueryService 服务的 actor
+    // 2. 获取 MetricQueryService 的 akka url （metricQueryServicePath）
     metricRegistry.startQueryService(jobManagerSystem, null)
 
+    // 启动 JobManager 及其所有组件，包括 WebMonitor。
     val (_, _, webMonitorOption, _) = try {
       startJobManagerActors(
         jobManagerSystem,
@@ -2055,6 +2072,7 @@ object JobManager {
     }
 
     // block until everything is shut down
+    // 阻塞直到所有线程都被关闭
     jobManagerSystem.awaitTermination()
 
     webMonitorOption.foreach{
@@ -2107,32 +2125,37 @@ object JobManager {
       listeningPortRange: java.util.Iterator[Integer])
     : Unit = {
 
-    val result = AkkaUtils.retryOnBindException({
-      // Try all ports in the range until successful
-      // 尝试在范围内所有端口，直到成功为止
-      val socket = NetUtils.createSocketFromPorts(
-        listeningPortRange,
-        new NetUtils.SocketFactory {
-          override def createSocket(port: Int): ServerSocket = new ServerSocket(
-            // Use the correct listening address, bound ports will only be
-            // detected later by Akka.
-            // 使用正确的监听地址，稍后由 Akka 检测绑定的端口。
-            port, 0, InetAddress.getByName(NetUtils.getWildcardIPAddress))
-        })
+    val result = AkkaUtils.retryOnBindException(
+      {
+        // Try all ports in the range until successful
+        // 尝试在范围内所有端口，直到成功为止
+        val socket = NetUtils.createSocketFromPorts(
+          listeningPortRange,
+          new NetUtils.SocketFactory {
+            override def createSocket(port: Int): ServerSocket = new ServerSocket(
+              // Use the correct listening address, bound ports will only be
+              // detected later by Akka.
+              // 使用正确的监听地址，稍后由 Akka 检测绑定的端口。
+              port, 0, InetAddress.getByName(NetUtils.getWildcardIPAddress))
+          })
 
-      val port =
-        if (socket == null) {
-          throw new BindException(s"Unable to allocate port for JobManager.")
-        } else {
-          try {
-            socket.getLocalPort()
-          } finally {
-            socket.close()
+        val port =
+          if (socket == null) {
+            throw new BindException(s"Unable to allocate port for JobManager.")
+          } else {
+            try {
+              socket.getLocalPort()
+            } finally {
+              socket.close()
+            }
           }
-        }
 
-      runJobManager(configuration, executionMode, listeningAddress, port)
-    }, { !listeningPortRange.hasNext }, 5000)
+        runJobManager(configuration, executionMode, listeningAddress, port)
+      },
+      // 重试终止条件，监听的端口范围尝试完为止
+      { !listeningPortRange.hasNext },
+      // 最大重试的时间
+      5000)
 
     result match {
       case scala.util.Failure(f) => throw f
@@ -2154,6 +2177,8 @@ object JobManager {
       port: Int): ActorSystem = {
 
     // Bring up the job manager actor system first, bind it to the given address.
+
+    // 首先启动作业 JobManager 的 Actor 系统，将其绑定到给定的地址。 Actor 系统的 name 为 flink
     val jobManagerSystem = BootstrapTools.startActorSystem(
       configuration,
       externalHostname,
@@ -2169,6 +2194,8 @@ object JobManager {
   }
 
   /** Starts the JobManager and all its components including the WebMonitor.
+    *
+    * 启动 JobManager 及其所有组件，包括 WebMonitor。
     *
     * @param configuration The configuration object for the JobManager
     * @param executionMode The execution mode in which to run. Execution mode LOCAL with spawn an
@@ -2193,7 +2220,7 @@ object JobManager {
       highAvailabilityServices: HighAvailabilityServices,
       metricRegistry: FlinkMetricRegistry,
       jobManagerClass: Class[_ <: JobManager],
-      archiveClass: Class[_ <: MemoryArchivist],
+      archiveClass: Class[_ <: MemoryArchivist], //内存归档
       resourceManagerClass: Option[Class[_ <: FlinkResourceManager[_]]])
     : (ActorRef, ActorRef, Option[WebMonitor], Option[ActorRef]) = {
 
@@ -2205,6 +2232,7 @@ object JobManager {
 
         // start the web frontend. we need to load this dynamically
         // because it is not in the same project/dependencies
+        // 启动 web 前端。我们需要动态地加载它，因为它不在同一个项目/依赖项中
         val webServer = WebMonitorUtils.startWebRuntimeMonitor(
           configuration,
           highAvailabilityServices,
@@ -2220,11 +2248,13 @@ object JobManager {
       }
 
     // Reset the port (necessary in case of automatic port selection)
+    // 重置端口(在端口自动选择的情况下必须重置)
     webMonitor.foreach{ monitor => configuration.setInteger(
       WebOptions.PORT, monitor.getServerPort) }
 
     try {
       // bring up the job manager actor
+      // 启动 JobManager actor
       LOG.info("Starting JobManager actor")
       val (jobManager, archive) = startJobManagerActors(
         configuration,
@@ -2239,6 +2269,7 @@ object JobManager {
 
       // start a process reaper that watches the JobManager. If the JobManager actor dies,
       // the process reaper will kill the JVM process (to ensure easy failure detection)
+      // 启动一个“终结者”进程来监视 JobManager。如果 JobManager actor 死亡，则进程“终结者”将 kill JVM进程
       LOG.debug("Starting JobManager process reaper")
       jobManagerSystem.actorOf(
         Props(
@@ -2249,6 +2280,7 @@ object JobManager {
         "JobManager_Process_Reaper")
 
       // bring up a local task manager, if needed
+      // 如果 JobManager 的模式为 LOCAL ，启动一个本地的 TaskManager
       if (executionMode == JobManagerMode.LOCAL) {
         LOG.info("Starting embedded TaskManager for JobManager's LOCAL execution mode")
 
@@ -2276,10 +2308,12 @@ object JobManager {
       }
 
       // start web monitor
+      // 启动 web 监控页面
       webMonitor.foreach {
         _.start()
       }
 
+      // 启动资源管理器的 Actor
       val resourceManager =
         resourceManagerClass match {
           case Some(rmClass) =>
@@ -2429,6 +2463,15 @@ object JobManager {
    * Create the job manager components as (instanceManager, scheduler, libraryCacheManager,
    *              archiverProps, defaultExecutionRetries,
    *              delayBetweenRetries, timeout)
+    *
+    * 创建 JobManager 组件
+    *  - instanceManager          ：实例管理器
+    *  - scheduler                ：调度器
+    *  - libraryCacheManager      ：库缓存管理器
+    *  - archiverProps            ：归档属性
+    *  - defaultExecutionRetries  ：
+    *  - delayBetweenRetries      ：
+    *  - timeout                  ：超时时间
    *
    * @param configuration The configuration from which to parse the config values.
    * @param futureExecutor to run JobManager's futures
@@ -2592,7 +2635,9 @@ object JobManager {
   /**
    * Starts the JobManager and job archiver based on the given configuration, in the
    * given actor system.
-   *
+    *
+    * 在给定的 Actor 系统中，根据给定的配置，启动 JobManager 和 Job 归档器。
+    *
    * @param configuration The configuration for the JobManager
    * @param actorSystem The actor system running the JobManager
    * @param futureExecutor to run JobManager's futures
@@ -2621,6 +2666,11 @@ object JobManager {
       archiveClass: Class[_ <: MemoryArchivist])
     : (ActorRef, ActorRef) = {
 
+    // 创建并启动以下组件：
+    // 1. instanceManager TaskManager 实例管理器
+    // 2. scheduler Job 调度器
+    // 3. blobServer 缓存服务
+    // 4. libraryCacheManager 库缓存管理器
     val (instanceManager,
     scheduler,
     blobServer,
@@ -2640,6 +2690,8 @@ object JobManager {
     val archiveProps = getArchiveProps(archiveClass, archiveCount, archivePath)
 
     // start the archiver with the given name, or without (avoid name conflicts)
+
+    // 启动归档器
     val archive: ActorRef = archiveActorName match {
       case Some(actorName) => actorSystem.actorOf(archiveProps, actorName)
       case None => actorSystem.actorOf(archiveProps)
@@ -2665,6 +2717,7 @@ object JobManager {
       jobManagerMetricGroup,
       optRestAddress)
 
+    // 启动 JobManager Actor
     val jobManager: ActorRef = jobManagerActorName match {
       case Some(actorName) => actorSystem.actorOf(jobManagerProps, actorName)
       case None => actorSystem.actorOf(jobManagerProps)

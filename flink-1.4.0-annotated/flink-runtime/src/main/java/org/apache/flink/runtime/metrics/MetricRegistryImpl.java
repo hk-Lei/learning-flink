@@ -60,6 +60,7 @@ import scala.concurrent.duration.FiniteDuration;
 /**
  * A MetricRegistry keeps track of all registered {@link Metric Metrics}. It serves as the
  * connection between {@link MetricGroup MetricGroups} and {@link MetricReporter MetricReporters}.
+ *
  * MetricRegistry 持续跟踪所有注册的 Metrics，它连接了 MetricGroups 和 MetricReporters
  */
 public class MetricRegistryImpl implements MetricRegistry {
@@ -84,7 +85,8 @@ public class MetricRegistryImpl implements MetricRegistry {
 
 	/**
 	 * Creates a new MetricRegistry and starts the configured reporter.
-	 * 创建一个新的 MetricRegistry ，并启动配置的 reporter。
+	 *
+	 * 创建一个 MetricRegistry ，并启动配置的 reporter。
 	 */
 	public MetricRegistryImpl(MetricRegistryConfiguration config) {
 		this.scopeFormats = config.getScopeFormats();
@@ -168,7 +170,10 @@ public class MetricRegistryImpl implements MetricRegistry {
 
 	/**
 	 * Initializes the MetricQueryService.
+	 *
 	 * 初始化 MetricQueryService
+	 * 1. 启动 MetricQueryService 服务
+	 * 2. 获取 MetricQueryService 的 akka url （metricQueryServicePath）
 	 *
 	 * @param actorSystem ActorSystem to create the MetricQueryService on
 	 * @param resourceID resource ID used to disambiguate the actor name
