@@ -2082,6 +2082,7 @@ object TaskManager {
       highAvailabilityServices,
       taskManagerMetricGroup)
 
+    // 创建 TaskManager actor
     taskManagerActorName match {
       case Some(actorName) => actorSystem.actorOf(tmProps, actorName)
       case None => actorSystem.actorOf(tmProps)
