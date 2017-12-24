@@ -121,7 +121,12 @@ import scala.language.postfixOps
  *
  * JobManager 负责接收 Flink job、调度 job 的 task、收集 job 状态及管理 TaskManager。它是使用 Actor 实现的，会收到如下的消息:
  *
- *  - [[RegisterTaskManager]]
+  * - [[RegisterTaskManager]]
+  * - [[SubmitJob]]
+  * - [[CancelJob]]
+  * - [[UpdateTaskExecutionState]]
+  * - [[RequestNextInputSplit]]
+  * - [[JobStatusChanged]]
  */
 class JobManager(
     protected val flinkConfiguration: Configuration,
@@ -2256,6 +2261,11 @@ object JobManager {
       // bring up the job manager actor
       // 启动 JobManager actor
       LOG.info("Starting JobManager actor")
+      // 创建并启动以下组件：
+      //  1. instanceManager TaskManager 实例管理器
+      //  2. scheduler Job 调度器
+      //  3. blobServer 缓存服务
+      //  4. libraryCacheManager 库缓存管理器
       val (jobManager, archive) = startJobManagerActors(
         configuration,
         jobManagerSystem,

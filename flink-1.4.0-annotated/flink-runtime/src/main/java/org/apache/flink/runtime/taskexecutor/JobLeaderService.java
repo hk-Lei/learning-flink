@@ -51,6 +51,11 @@ import java.util.concurrent.Executor;
  * successfully establishing a connection, the job leader listener is notified about the new job
  * leader and its connection. In case that a job leader loses leadership, the job leader listener
  * is notified as well.
+ *
+ * 该服务负责监听已注册的所有 job 的 job leader（一个给定 job 的 job manager 就是其 leader）。
+ * 在检查到 job 后，该服务尝试与其 job leader 建立联系，
+ * 连接建立成功后，job leader listener 将会收到有关 job leader 的变动和连接情况。
+ * 如果一个 job leader 失去了领导能力，job leader listener 也会得到通知。
  */
 public class JobLeaderService {
 

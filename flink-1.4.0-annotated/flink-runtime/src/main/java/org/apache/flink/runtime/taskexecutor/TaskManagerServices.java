@@ -190,6 +190,14 @@ public class TaskManagerServices {
 
 		final JobLeaderService jobLeaderService = new JobLeaderService(taskManagerLocation);
 
+		// 1. taskManagerLocation 				TaskManager 链接信息管理
+		// 2. memoryManager 					内存管理
+		// 3. ioManager 						异步 IO 管理
+		// 4. broadcastVariableManager 			广播变量管理
+		// 5. fileCache 						文件缓存管理
+		// 6. taskSlotTable						任务槽位管理
+		// 7. jobManagerTable					各作业的JobManagerConnection管理
+		// 8. jobLeaderService					job leader 有关的服务，主要监听 job manager 的变动和连接情况
 		return new TaskManagerServices(
 			taskManagerLocation,
 			memoryManager,

@@ -117,7 +117,30 @@ import scala.language.postfixOps
  *
  *    - Exceptions releasing intermediate result resources. Critical resource leak,
  *      requires a clean JVM.
- */
+  *
+  * TaskManager 负责执行 Flink Job 的单个 Task，实现了 Actor。TaskManager 有以下几个阶段:
+  *
+  *  - "等待注册阶段" : 在这个阶段，它定期向 JobManager 发送 RegisterTaskManager 消息。
+  *    在成功注册后，JobManager 会使用一个 AcknowledgeRegistration 消息来回复。
+  *    然后停止注册并初始化 JobManager 的 Actor 需要引用的所有字段。
+  *  - "运行阶段" : 在这个阶段，TaskManager 接收并处理 Task 相关的消息，如 [[SubmitTask]], [[CancelTask]], [[FailTask]]
+  *    如果 TaskManager 与 JobManager 断开连接(因为 JobManager 不可访问)，TaskManager 将返回 “等待注册” 的状态。
+  *
+  * ========== TaskManager 的失败模型 ==========
+  *
+  * TaskManager 在 task 失败时尽可能将其标记为失败并删除其所有资源。
+  * 使 JobManager 重启该 task (在同一个或不同的 TaskManager 上)。
+  *
+  * 在某些情况下，异常表明 TaskManager 无法继续执行。最健壮的清理方法是让 os/内核 执行它，因此我们将触发终止进程。
+  * 在 YARN (或弹性独立模式)的情况下，该进程将重新启动，生成一个干净的状态。
+  * 为了实现这一点，我们将杀死 TaskManager Actor。监控 Actor(进程终结者)将感知到并杀死 TaskManager 进程。
+  *
+  * 需要 TaskManager JVM 重启的致命错误包括:
+  *   - TaskManager 在 JobManager 上注册后出现的导致网络堆栈或库缓存的错误。TaskManager 不能没有他们而运行。
+  *   - 在释放 task 资源时来自网络堆栈、中间结果或内存管理器的异常。
+  *     这些情况表明资源管理中出现了严重的泄漏，只有通过 JVM 重新启动才能可靠地修复资源管理。
+  *   - 释放中间结果资源时的异常，关键资源泄露，需要一个干净的 JVM。
+  */
 class TaskManager(
     protected val config: TaskManagerConfiguration,
     protected val resourceID: ResourceID,
@@ -1524,6 +1547,8 @@ class TaskManager(
 /**
  * TaskManager companion object. Contains TaskManager executable entry point, command
  * line parsing, constants, and setup methods for the TaskManager.
+  *
+  * TaskManager 伴生对象。包含 TaskManager 的可执行入口、命令行解析、常量及设置方法。
  */
 object TaskManager {
 
@@ -1553,11 +1578,14 @@ object TaskManager {
 
   /**
    * Entry point (main method) to run the TaskManager in a standalone fashion.
+    *
+    * 以独立模式运行 TaskManager 时的入口（main 方法）。
    *
    * @param args The command line arguments.
    */
   def main(args: Array[String]): Unit = {
     // startup checks and logging
+    // 启动时检查并打印日志
     EnvironmentInformation.logEnvironmentInfo(LOG.logger, "TaskManager", args)
     SignalHandler.register(LOG.logger)
     JvmShutdownSafeguard.installAsShutdownHook(LOG.logger)
@@ -1581,9 +1609,11 @@ object TaskManager {
     }
 
     // In Standalone mode, we generate a resource identifier.
+    // 在独立模式中，我们生成一个资源标识符。
     val resourceId = ResourceID.generate()
 
     // run the TaskManager (if requested in an authentication enabled context)
+    // 运行 TaskManager (如果启用身份验证)
     SecurityUtils.install(new SecurityConfiguration(configuration))
 
     try {
@@ -1667,6 +1697,15 @@ object TaskManager {
    * for the TaskManager and its actors, starts the TaskManager's services
    * (library cache, shuffle network stack, ...), and starts the TaskManager itself.
    *
+    * 启动并运行 TaskManager
+    *
+    * 该方法首先尝试选择用于 TaskManager 通信的网络接口。网络接口既用于 actor 通信(协调)，
+    * 也用于 TaskManager 之间的数据交换。除非在配置中显式配置主机名/接口，
+    * 否则该方法将尝试连接到 JobManager 的所有接口和方法，并选择尝试成功的连接方法。
+    *
+    * 在选择网络接口之后，这个方法为 TaskManager 和它的 actors 启动一个 actor系统，
+    * 启动 TaskManager 的服务(库缓存、shuffle 网络栈、等等)，并启动 TaskManager 本身。
+    *
    * @param configuration The configuration for the TaskManager.
    * @param taskManagerClass The actor class to instantiate.
    *                         Allows to use TaskManager subclasses for example for YARN.
@@ -1787,6 +1826,11 @@ object TaskManager {
    *
    * This method will also spawn a process reaper for the TaskManager (kill the process if
    * the actor fails) and optionally start the JVM memory logging thread.
+    *
+    * 启动并运行 TaskManager。为 TaskManager 和它的 actors 启动一个 Actor 系统，
+    * 启动 TaskManager 的服务(库缓存、shuffle 网络栈等等)，并启动 TaskManager 本身。
+    *
+    * 该方法还将为 TaskManager 生成一个进程终结者(如果 actor 失败了，将终止进程)，可选择地启动 JVM 内存记录日志线程。
    *
    * @param taskManagerHostname The hostname/address of the interface where the actor system
    *                         will communicate.
@@ -1901,6 +1945,8 @@ object TaskManager {
     * Starts and runs the TaskManager. with all its components trying to bind to
     * a port in the specified range.
     *
+    * 启动并运行 TaskManager。尝试绑定其所有组件到指定范围的端口上。
+    *
     * @param taskManagerHostname The hostname/address of the interface where the actor system
     *                         will communicate.
     * @param resourceID The id of the resource which the task manager will run on.
@@ -1919,36 +1965,42 @@ object TaskManager {
     taskManagerClass: Class[_ <: TaskManager])
     : Unit = {
 
-    val result = AkkaUtils.retryOnBindException({
-      // Try all ports in the range until successful
-      val socket = NetUtils.createSocketFromPorts(
-        actorSystemPortRange,
-        new NetUtils.SocketFactory {
-          override def createSocket(port: Int): ServerSocket = new ServerSocket(
-            // Use the correct listening address, bound ports will only be
-            // detected later by Akka.
-            port, 0, InetAddress.getByName(NetUtils.getWildcardIPAddress))
-        })
+    val result = AkkaUtils.retryOnBindException(
+      {
+        // Try all ports in the range until successful
+        // 尝试在范围内所有端口，直到成功为止
+        val socket = NetUtils.createSocketFromPorts(
+          actorSystemPortRange,
+          new NetUtils.SocketFactory {
+            override def createSocket(port: Int): ServerSocket = new ServerSocket(
+              // Use the correct listening address, bound ports will only be
+              // detected later by Akka.
+              port, 0, InetAddress.getByName(NetUtils.getWildcardIPAddress))
+          })
 
-      val port =
-        if (socket == null) {
-          throw new BindException(s"Unable to allocate port for TaskManager.")
-        } else {
-          try {
-            socket.getLocalPort()
-          } finally {
-            socket.close()
+        val port =
+          if (socket == null) {
+            throw new BindException(s"Unable to allocate port for TaskManager.")
+          } else {
+            try {
+              socket.getLocalPort()
+            } finally {
+              socket.close()
+            }
           }
-        }
 
-      runTaskManager(
-        taskManagerHostname,
-        resourceID,
-        port,
-        configuration,
-        highAvailabilityServices,
-        taskManagerClass)
-    }, { !actorSystemPortRange.hasNext }, 5000)
+        runTaskManager(
+          taskManagerHostname,
+          resourceID,
+          port,
+          configuration,
+          highAvailabilityServices,
+          taskManagerClass)
+      },
+      // 重试终止条件，监听的端口范围尝试完为止
+      { !actorSystemPortRange.hasNext },
+      // 最大重试的时间
+      5000)
 
     result match {
       case scala.util.Failure(f) => throw f
@@ -2000,6 +2052,15 @@ object TaskManager {
 
     val taskManagerConfiguration = TaskManagerConfiguration.fromConfiguration(configuration)
 
+
+    // 1. taskManagerLocation 				  TaskManager 链接信息管理
+    // 2. memoryManager 					      内存管理
+    // 3. ioManager 						        异步 IO 管理
+    // 4. broadcastVariableManager 			广播变量管理
+    // 5. fileCache 						        文件缓存管理
+    // 6. taskSlotTable						      任务槽位管理
+    // 7. jobManagerTable					      各作业的JobManagerConnection管理
+    // 8. jobLeaderService					    job leader 有关的服务，主要监听 job manager 的变动和连接情况
     val taskManagerServices = TaskManagerServices.fromConfiguration(
       taskManagerServicesConfiguration,
       resourceID)

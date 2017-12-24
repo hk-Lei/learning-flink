@@ -25,6 +25,8 @@ import java.util.Map;
 
 /**
  * Container for multiple {@link JobManagerConnection} registered under their respective job id.
+ *
+ * 在各自的 job id 下注册的多个 JobManagerConnection 的容器
  */
 public class JobManagerTable {
 	private final Map<JobID, JobManagerConnection> jobManagerConnections;
