@@ -144,6 +144,8 @@ public class TaskManagerServices {
 	/**
 	 * Creates and returns the task manager services.
 	 *
+	 * 创建并返回 TaskManager 的服务。
+	 *
 	 * @param resourceID resource ID of the task manager
 	 * @param taskManagerServicesConfiguration task manager configuration
 	 * @return task manager components

@@ -126,7 +126,7 @@ import scala.language.postfixOps
   *  - "运行阶段" : 在这个阶段，TaskManager 接收并处理 Task 相关的消息，如 [[SubmitTask]], [[CancelTask]], [[FailTask]]
   *    如果 TaskManager 与 JobManager 断开连接(因为 JobManager 不可访问)，TaskManager 将返回 “等待注册” 的状态。
   *
-  * ========== TaskManager 的失败模型 ==========
+  * ========== TaskManager 失败情况 ==========
   *
   * TaskManager 在 task 失败时尽可能将其标记为失败并删除其所有资源。
   * 使 JobManager 重启该 task (在同一个或不同的 TaskManager 上)。
