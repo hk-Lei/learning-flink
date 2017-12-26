@@ -53,6 +53,14 @@ import java.util.Set;
  * On-demand allocation means that the memory manager only keeps track how many memory segments are
  * currently allocated (bookkeeping only). Releasing a memory segment will not add it back to the pool,
  * but make it re-claimable by the garbage collector.
+ *
+ * 内存管理器 : 管理着 Flink 用于排序、散列和缓存的内存。内存用大小相等的 segment 表示。Operator 通过请求大量的内存段来分配内存。
+ *
+ * <p> 内存可以为堆内或堆外内存(都封装在 HybridMemorySegment)。使用哪种内存可以通过参数传递给 MemoryManager 服务初始化。
+ *
+ * <p> 内存管理器可以预先分配所有内存，也可以在需要时再分配内存。
+ * 在以前的版本中，在启动时就会分配好内存，因此在请求内存时不会出现 OutOfMemoryError。释放内存也会返回到 MemoryManager 的内存池中。
+ * 按需分配意味着内存管理器只跟踪当前分配了多少 segment (仅记录日志)。释放内存段将不会把它返回到内存池中，而是让垃圾收集器回收。
  */
 public class MemoryManager {
 
@@ -78,6 +86,7 @@ public class MemoryManager {
 	private final MemoryType memoryType;
 
 	/** Mask used to round down sizes to multiples of the page size. */
+	// 用于将 size 四舍五入到 page size 的倍数
 	private final long roundingMask;
 
 	/** The size of the memory segments. */
@@ -167,6 +176,7 @@ public class MemoryManager {
 				this.memoryPool = new HybridHeapMemoryPool(memToAllocate, pageSize);
 				break;
 			case OFF_HEAP:
+				// 建议当使用 off-heap 时使用预先分配的方式
 				if (!preAllocateMemory) {
 					LOG.warn("It is advisable to set 'taskmanager.memory.preallocate' to true when" +
 						" the memory type 'taskmanager.memory.off-heap' is set to true.");
@@ -220,6 +230,8 @@ public class MemoryManager {
 
 	/**
 	 * Checks if the memory manager all memory available.
+	 *
+	 * 检查内存管理器是否有可用内存。
 	 *
 	 * @return True, if the memory manager is empty and valid, false if it is not empty or corrupted.
 	 */

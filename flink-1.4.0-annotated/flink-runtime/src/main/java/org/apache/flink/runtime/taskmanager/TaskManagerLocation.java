@@ -51,12 +51,15 @@ public class TaskManagerLocation implements Comparable<TaskManagerLocation>, jav
 
 	/** The ID of the resource in which the TaskManager is started. This can be for example
 	 * the YARN container ID, Mesos container ID, or any other unique identifier. */
+	// TaskManager 的资源ID。可以是 YARN、Mesos 的容器ID 或 其他的唯一标识符。
 	private final ResourceID resourceID;
 
 	/** The network address that the TaskManager binds its sockets to */
+	// TaskManager 绑定的网络套接字地址
 	private final InetAddress inetAddress;
 
 	/** The fully qualified host name of the TaskManager */
+	// TaskManager 的完全限定主机名
 	private final String fqdnHostName;
 
 	/** The pure hostname, derived from the fully qualified host name. */

@@ -92,6 +92,8 @@ import java.nio.ReadOnlyBufferException;
  * actual implementation. This is easy for the JIT to recognize through class hierarchy analysis,
  * or by identifying that the invocations are monomorphic (all go to the same concrete
  * method implementation). Under these conditions, the JIT can perfectly inline methods.
+ *
+ * 这个类代表了 Flink 管理的一个内存片段，该片段可以是堆内存(字节数组)或非堆内存。
  */
 @Internal
 public abstract class MemorySegment {
