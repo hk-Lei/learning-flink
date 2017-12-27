@@ -235,6 +235,7 @@ public class PackagedProgram {
 		this.mainClass = entryPointClass;
 
 		// if the entry point is a program, instantiate the class and get the plan
+		// 如果入口点是一个 program(继承 Program 接口) ，实例化这个类并得到该计划
 		if (Program.class.isAssignableFrom(this.mainClass)) {
 			Program prg = null;
 			try {

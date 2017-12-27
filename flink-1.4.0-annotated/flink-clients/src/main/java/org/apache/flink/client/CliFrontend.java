@@ -137,12 +137,14 @@ public class CliFrontend {
 			customCommandLines.add(loadCustomCommandLine(flinkYarnSessionCLI, "y", "yarn"));
 		} catch (Exception e) {
 			LOG.warn("Could not load CLI class {}.", flinkYarnSessionCLI, e);
+			System.out.printf("Could not load CLI class %s, %s.\n", flinkYarnSessionCLI, e);
 		}
 
 		try {
 			customCommandLines.add(loadCustomCommandLine(flinkYarnCLI, "y", "yarn"));
 		} catch (Exception e) {
 			LOG.warn("Could not load CLI class {}.", flinkYarnCLI, e);
+			System.out.printf("Could not load CLI class %s, %s.\n", flinkYarnCLI, e);
 		}
 
 		customCommandLines.add(new Flip6DefaultCLI());
@@ -920,10 +922,17 @@ public class CliFrontend {
 			PackagedProgram program) throws Exception {
 
 		// Get the custom command-line (e.g. Standalone/Yarn/Mesos)
+		// 获取特定的 命令行 （例如： Standalone、Yarn、Mesos）
+		// 顺序依次是 flinkYarnSessionCLI > flinkYarnCLI > Flip6DefaultCLI > DefaultCLI
 		CustomCommandLine<?> activeCommandLine = getActiveCustomCommandLine(options.getCommandLine());
 
 		ClusterClient client;
 		try {
+			// 尝试连接 Cluster， 返回 Client 实例，如果抛出 UnsupportedOperationException，则创建 Cluster 返回 Client 实例
+			// FlinkYarnSessionCLI -> YarnClusterClient
+			// FlinkYarnCLI -> YarnClusterClientV2
+			// Flip6DefaultCLI -> RestClusterClient
+			// DefaultCLI -> StandaloneClusterClient
 			client = activeCommandLine.retrieveCluster(options.getCommandLine(), config, configurationDirectory);
 			logAndSysout("Cluster configuration: " + client.getClusterIdentifier());
 		} catch (UnsupportedOperationException e) {
