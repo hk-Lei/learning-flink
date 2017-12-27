@@ -114,6 +114,7 @@ public final class InstantiationUtil {
 		}
 		
 		// check if the class is a subclass, if the check is required
+		// 如果需要，检查类是否为子类
 		if (castTo != null && !castTo.isAssignableFrom(clazz)) {
 			throw new RuntimeException("The class '" + clazz.getName() + "' is not a subclass of '" + 
 				castTo.getName() + "' as is required.");

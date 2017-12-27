@@ -55,6 +55,8 @@ import java.util.jar.Manifest;
  * This class encapsulates represents a program, packaged in a jar file. It supplies
  * functionality to extract nested libraries, search for the program entry point, and extract
  * a program plan.
+ *
+ * 这个类封装了打包在一个 jar 文件中的程序。它提供了提取嵌套的库、搜索程序入口点和提取程序计划的功能。
  */
 public class PackagedProgram {
 

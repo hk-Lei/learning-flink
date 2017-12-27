@@ -127,6 +127,10 @@ public class CliFrontend {
 		//	to prefix all options with y/yarn.
 		//	Tips: DefaultCLI must be added at last, because getActiveCustomCommandLine(..) will get the
 		//	      active CustomCommandLine in order and DefaultCLI isActive always return true.
+
+		// YARN 会话的命令行接口，会根据 y/yarn 的配置项初始化
+		// 注意： DefaultCLI 必须添加到最后，因为 getActiveCustomCommandLine(...) 方法
+		// 将按照顺序获得活着的 CustomCommandLine，而 DefaultCLI 的 isActive 方法总是返回 true。
 		final String flinkYarnSessionCLI = "org.apache.flink.yarn.cli.FlinkYarnSessionCli";
 		final String flinkYarnCLI = "org.apache.flink.yarn.cli.FlinkYarnCLI";
 		try {
@@ -836,6 +840,8 @@ public class CliFrontend {
 	/**
 	 * Creates a Packaged program from the given command line options.
 	 *
+	 * 从给定的命令行选项创建一个打包的程序。
+	 *
 	 * @return A PackagedProgram (upon success)
 	 * @throws java.io.FileNotFoundException
 	 * @throws org.apache.flink.client.program.ProgramInvocationException
@@ -867,6 +873,7 @@ public class CliFrontend {
 				new PackagedProgram(jarFile, classpaths, programArgs) :
 				new PackagedProgram(jarFile, classpaths, entryPointClass, programArgs);
 
+		// 加载保存点的配置
 		program.setSavepointRestoreSettings(options.getSavepointRestoreSettings());
 
 		return program;
@@ -1030,6 +1037,8 @@ public class CliFrontend {
 	/**
 	 * Parses the command line arguments and starts the requested action.
 	 *
+	 * 解析命令行参数并启动所请求的操作。
+	 *
 	 * @param args command line arguments of the client.
 	 * @return The return code of the program
 	 */
@@ -1087,6 +1096,9 @@ public class CliFrontend {
 
 	/**
 	 * Submits the job based on the arguments.
+	 *
+	 * 根据参数提交作业。所有 job 相关的命令行入口
+	 *
 	 */
 	public static void main(final String[] args) {
 		EnvironmentInformation.logEnvironmentInfo(LOG, "Command Line Client", args);
@@ -1179,6 +1191,9 @@ public class CliFrontend {
 
 	/**
 	 * Loads a class from the classpath that implements the CustomCommandLine interface.
+	 *
+	 * 从实现 CustomCommandLine 接口的 classpath 中实例化一个指定类的实例。
+	 *
 	 * @param className The fully-qualified class name to load.
 	 * @param params The constructor parameters
 	 */
