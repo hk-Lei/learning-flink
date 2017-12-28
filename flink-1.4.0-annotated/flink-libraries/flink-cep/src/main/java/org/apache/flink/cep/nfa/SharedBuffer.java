@@ -67,6 +67,10 @@ import java.util.Stack;
  * @see <a href="https://people.cs.umass.edu/~yanlei/publications/sase-sigmod08.pdf">
  *     https://people.cs.umass.edu/~yanlei/publications/sase-sigmod08.pdf</a>
  *
+ * 一个共享的缓冲区实现，它将值存储在一个 key 下面。此外，可以对值进行版本化，这样就可以在缓冲区中检索它们的先祖元素。
+ *
+ * <p> 实现的想法是对每个键都有一个专用的 SharedBufferPage 。每个缓冲页维护一个插入值的集合
+ *
  * @param <K> Type of the keys
  * @param <V> Type of the values
  */
@@ -393,6 +397,8 @@ public class SharedBuffer<K extends Serializable, V> implements Serializable {
 
 	/**
 	 * The SharedBufferPage represents a set of elements which have been stored under the same key.
+	 *
+	 * SharedBufferPage 表示存储在同一个键下的元素集合 (Set)。
 	 *
 	 * @param <K> Type of the key
 	 * @param <V> Type of the value

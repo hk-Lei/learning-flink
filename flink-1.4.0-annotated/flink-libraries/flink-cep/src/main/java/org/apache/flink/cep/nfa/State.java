@@ -35,6 +35,10 @@ import java.util.Objects;
  * state transitions. The state transitions describe under which conditions it is possible to enter
  * a new state.
  *
+ * 代表 非确定有限状态机 NFA 的状态
+ *
+ * <p> 每个状态都由一个名称和一个状态类型标识。此外，它还包含状态转换的集合。状态转换描述了在何种条件下可以进入一个新的状态。
+ *
  * @param <T> Type of the input events
  */
 public class State<T> implements Serializable {
@@ -142,8 +146,11 @@ public class State<T> implements Serializable {
 	 * Set of valid state types.
 	 */
 	public enum StateType {
+		// 非确定有限自动机 (NFA) 的起始状态
 		Start, // the state is a starting state for the NFA
+		// 非确定有限自动机 (NFA) 的最终状态
 		Final, // the state is a final state for the NFA
+		// 非确定有限自动机 (NFA) 的中间状态
 		Normal, // the state is neither a start nor a final state
 		Stop
 	}

@@ -35,12 +35,19 @@ import java.util.Arrays;
  * to v' iff v contains v' as a prefix or if both dewey number differ only in the last digit and
  * the last digit of v is greater than v'.
  *
+ * 版本控制方案，它允许检索不同版本之间的依赖关系。
+ *
+ * <p> 一个杜威数字（杜威十进制分类法）由数字 d1.d2.d3. ... .dn 组成。
+ * 杜威数字 v 和 v' 的区别 ：
+ * 1）v 包含了 v’ 作为前缀；
+ * 2）v 和 v' 仅在最后一个数字上有差异，并且 v 的最后一个数字大于 v'。
+ *
  */
 public class DeweyNumber implements Serializable {
 
 	private static final long serialVersionUID = 6170434818252267825L;
 
-	// sequence of digits
+	// sequence of digits 杜威数字的序列
 	private final int[] deweyNumber;
 
 	public DeweyNumber(int start) {
@@ -61,10 +68,13 @@ public class DeweyNumber implements Serializable {
 	 * <p>True iff this contains other as a prefix or iff they differ only in the last digit whereas
 	 * the last digit of this is greater than the last digit of other.
 	 *
+	 * 检查这个杜威数字是否与另一个杜威数字兼容。
+	 *
 	 * @param other The other dewey number to check compatibility against
 	 * @return Whether this dewey number is compatible to the other dewey number
 	 */
 	public boolean isCompatibleWith(DeweyNumber other) {
+		// 当前的数值数目多于另一个，则从头开始比对，前缀必须完全相等
 		if (length() > other.length()) {
 			// prefix case
 			for (int i = 0; i < other.length(); i++) {
@@ -74,7 +84,9 @@ public class DeweyNumber implements Serializable {
 			}
 
 			return true;
-		} else if (length() == other.length()) {
+		}
+		// 数值数目相等，前n-1个必须相等，最后一个数值，当前的必须比另一个大
+		else if (length() == other.length()) {
 			// check init digits for equality
 			int lastIndex = length() - 1;
 			for (int i = 0; i < lastIndex; i++) {
@@ -85,7 +97,9 @@ public class DeweyNumber implements Serializable {
 
 			// check that the last digit is greater or equal
 			return deweyNumber[lastIndex] >= other.deweyNumber[lastIndex];
-		} else {
+		}
+		// 如果当前数值数目比另一个的数值数目少，则明显不兼容
+		else {
 			return false;
 		}
 	}

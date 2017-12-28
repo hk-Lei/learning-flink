@@ -28,6 +28,8 @@ import java.util.Objects;
 /**
  * Represents a transition from one {@link State} to another.
  *
+ * 表示从一个 State 到另一个 State 的转换。
+ *
  * @param <T> type of events that are handled by the {@link IterativeCondition}
  */
 public class StateTransition<T> implements Serializable {
