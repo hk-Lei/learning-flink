@@ -217,6 +217,8 @@ public class SharedBuffer<K extends Serializable, V> implements Serializable {
 	 * Returns all elements from the previous relation starting at the given value with the
 	 * given key and timestamp.
 	 *
+	 * 给定的值、键和时间戳，返回前置关系中的所有元素
+	 *
 	 * @param key Key of the starting value
 	 * @param value Value of the starting element
 	 * @param timestamp Timestamp of the starting value
@@ -233,25 +235,34 @@ public class SharedBuffer<K extends Serializable, V> implements Serializable {
 		List<Map<K, List<V>>> result = new ArrayList<>();
 
 		// stack to remember the current extraction states
+		// 构建一个栈来记住当前提取的状态
 		Stack<ExtractionState<K, V>> extractionStates = new Stack<>();
 
 		// get the starting shared buffer entry for the previous relation
+		// 为了构建前置关系，根据键、值以及时间戳获得首个共享缓冲区项
 		SharedBufferEntry<K, V> entry = get(key, value, timestamp, counter);
 
+		// 如果记录项存在
 		if (entry != null) {
+			// 根据记录项，首先构建一个提取状态加入栈
 			extractionStates.add(new ExtractionState<>(entry, version, new Stack<SharedBufferEntry<K, V>>()));
 
 			// use a depth first search to reconstruct the previous relations
+			// 当提取状态的栈不为空时，使用深度优先的搜索来重构之前的关系
 			while (!extractionStates.isEmpty()) {
+				// 出栈一个对象
 				final ExtractionState<K, V> extractionState = extractionStates.pop();
 				// current path of the depth first search
+				// 深度优先搜索的当前路径
 				final Stack<SharedBufferEntry<K, V>> currentPath = extractionState.getPath();
 				final SharedBufferEntry<K, V> currentEntry = extractionState.getEntry();
 
 				// termination criterion
+				// 结束规则
 				if (currentEntry == null) {
 					final Map<K, List<V>> completePath = new LinkedHashMap<>();
 
+					// 出栈构建正向的完整路径存储到LinkedHashMultimap中，并加入到结果集
 					while (!currentPath.isEmpty()) {
 						final SharedBufferEntry<K, V> currentPathEntry = currentPath.pop();
 
@@ -271,14 +282,22 @@ public class SharedBuffer<K extends Serializable, V> implements Serializable {
 					currentPath.push(currentEntry);
 
 					boolean firstMatch = true;
+					// 从当前记录项开始探索与其关联的边，检测版本是否兼容
 					for (SharedBufferEdge<K, V> edge : currentEntry.getEdges()) {
 						// we can only proceed if the current version is compatible to the version
 						// of this previous relation
 						final DeweyNumber currentVersion = extractionState.getVersion();
+						// 如果版本号兼容
 						if (currentVersion.isCompatibleWith(edge.getVersion())) {
 							if (firstMatch) {
 								// for the first match we don't have to copy the current path
-								extractionStates.push(new ExtractionState<>(edge.getTarget(), edge.getVersion(), currentPath));
+								// 首次匹配，构建提取状态并直接加入栈中，后续匹配需要为提取状态构建新的路径栈，通过深度拷贝路径
+								// 因为除了首次匹配路径唯一之外，后续的匹配路径都可能不一致，因此不能共享状态
+								extractionStates.push(
+									new ExtractionState<>(
+										edge.getTarget(),
+										edge.getVersion(),
+										currentPath));
 								firstMatch = false;
 							} else {
 								final Stack<SharedBufferEntry<K, V>> copy = new Stack<>();

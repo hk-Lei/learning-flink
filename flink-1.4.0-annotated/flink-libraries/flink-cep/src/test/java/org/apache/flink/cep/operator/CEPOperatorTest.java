@@ -921,6 +921,111 @@ public class CEPOperatorTest extends TestLogger {
 	}
 
 	@Test
+	public void testCEPOperatorSerializationWRocksDB2() throws Exception {
+		String rocksDbPath = tempFolder.newFolder().getAbsolutePath();
+		RocksDBStateBackend rocksDBStateBackend = new RocksDBStateBackend(new MemoryStateBackend());
+		rocksDBStateBackend.setDbStoragePath(rocksDbPath);
+
+		final Event startEvent1 = new Event(40, "A", 1.0);
+		final Event startEvent2 = new Event(40, "A", 2.0);
+		final Event startEvent3 = new Event(40, "B", 2.0);
+		final Event startEvent4 = new Event(40, "A", 2.0);
+		final Event startEvent5 = new Event(40, "A", 2.0);
+		final Event startEvent6 = new Event(40, "B", 2.0);
+		final Event startEvent7 = new Event(40, "A", 2.0);
+		final Event startEvent8 = new Event(40, "A", 2.0);
+
+		final Pattern<Event, ?> pattern = Pattern.<Event>begin("start").where(new SimpleCondition<Event>() {
+			private static final long serialVersionUID = 5726188262756267490L;
+
+			@Override
+			public boolean filter(Event value) throws Exception {
+				return value.getName().equals("A");
+			}
+		}).oneOrMore()
+			.next("middle").where(new IterativeCondition<Event>() {
+
+			private static final long serialVersionUID = 6215754202506583964L;
+
+			@Override
+			public boolean filter (Event value, Context < Event > ctx) throws Exception {
+				if (!value.getName().startsWith("B")) {
+					return false;
+				}
+
+				double sum = 0.0;
+				for (Event event : ctx.getEventsForPattern("middle")) {
+					sum += event.getPrice();
+				}
+				sum += value.getPrice();
+				return Double.compare(sum, 5.0) < 0;
+			}
+		}).oneOrMore().allowCombinations();
+
+		SelectCepOperator<Event, Integer, Map<String, List<Event>>> operator = CepOperatorTestUtilities.getKeyedCepOpearator(
+			false,
+			new NFACompiler.NFAFactory<Event>() {
+				private static final long serialVersionUID = 477082663248051994L;
+
+				@Override
+				public NFA<Event> createNFA() {
+					return NFACompiler.compile(pattern, Event.createTypeSerializer(), false);
+				}
+			});
+
+		OneInputStreamOperatorTestHarness<Event, Map<String, List<Event>>> harness = CepOperatorTestUtilities.getCepTestHarness(operator);
+
+		try {
+			harness.setStateBackend(rocksDBStateBackend);
+			harness.open();
+
+			harness.processWatermark(0L);
+			harness.processElement(new StreamRecord<>(startEvent1, 1));
+			harness.processElement(new StreamRecord<Event>(startEvent2, 2));
+			harness.processWatermark(2L);
+			harness.processElement(new StreamRecord<Event>(startEvent3, 5));
+			harness.processElement(new StreamRecord<Event>(startEvent4, 3));
+			harness.processElement(new StreamRecord<>(startEvent5, 4));
+			harness.processWatermark(5L);
+			harness.processElement(new StreamRecord<>(startEvent6, 7));
+			harness.processElement(new StreamRecord<>(startEvent7, 8));
+			harness.processElement(new StreamRecord<Event>(startEvent8, 6));
+			harness.processWatermark(100L);
+
+			List<List<Event>> resultingPatterns = new ArrayList<>();
+			while (!harness.getOutput().isEmpty()) {
+				Object o = harness.getOutput().poll();
+				if (!(o instanceof Watermark)) {
+					StreamRecord<Map<String, List<Event>>> el =
+						(StreamRecord<Map<String, List<Event>>>) o;
+					List<Event> res = new ArrayList<>();
+					for (List<Event> le : el.getValue().values()) {
+						res.addAll(le);
+					}
+					resultingPatterns.add(res);
+				}
+			}
+
+//			compareMaps(resultingPatterns,
+//				Lists.<List<Event>>newArrayList(
+//					Lists.newArrayList(startEvent1, endEvent, middleEvent1, middleEvent2,
+//						middleEvent4),
+//					Lists.newArrayList(startEvent1, endEvent, middleEvent2, middleEvent1),
+//					Lists.newArrayList(startEvent1, endEvent, middleEvent3, middleEvent1),
+//					Lists.newArrayList(startEvent2, endEvent, middleEvent3, middleEvent4),
+//					Lists.newArrayList(startEvent1, endEvent, middleEvent4, middleEvent1),
+//					Lists.newArrayList(startEvent1, endEvent, middleEvent1),
+//					Lists.newArrayList(startEvent2, endEvent, middleEvent3)
+//				)
+//			);
+
+			System.out.println(resultingPatterns);
+		} finally {
+			harness.close();
+		}
+	}
+
+	@Test
 	public void testCEPOperatorComparatorProcessTime() throws Exception {
 		Event startEvent1 = new Event(42, "start", 1.0);
 		Event startEvent2 = new Event(42, "start", 2.0);

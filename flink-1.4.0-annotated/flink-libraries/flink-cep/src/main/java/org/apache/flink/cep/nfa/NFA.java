@@ -250,30 +250,39 @@ public class NFA<T> implements Serializable {
 		final Collection<Tuple2<Map<String, List<T>>, Long>> timeoutResult = new ArrayList<>();
 
 		// iterate over all current computations
+		// 遍历残留在队列中的 ComputationState
 		for (int i = 0; i < numberComputationStates; i++) {
+			// 队列中出队一个 ComputationState
 			ComputationState<T> computationState = computationStates.poll();
 
 			final Collection<ComputationState<T>> newComputationStates;
 
+			// 如果当前遍历的 ComputationState 不是起始状态，同时窗口时间大于零
+			// 且待处理事件的时间戳跟当前遍历状态的时间戳之差大于窗口时间（说明当前 ComputationState 已滞后）
 			if (!computationState.isStartState() &&
 				windowTime > 0L &&
 				timestamp - computationState.getStartTimestamp() >= windowTime) {
 
+				//如果 NFA 被指定处理超时，则根据当前的 ComputationState 对象提取超时的匹配模式的事件序列，
+				//并将超时的匹配模式的事件序列加入到timeoutResult用于最后的返回
 				if (handleTimeout) {
 					// extract the timed out event pattern
 					Map<String, List<T>> timedOutPattern = extractCurrentMatches(computationState);
 					timeoutResult.add(Tuple2.of(timedOutPattern, timestamp));
 				}
 
+				//从共享缓冲区中移除已经超出窗口长度的ComputationState对应的事件信息
 				eventSharedBuffer.release(
 						NFAStateNameHandler.getOriginalNameFromInternal(computationState.getPreviousState().getName()),
 						computationState.getEvent(),
 						computationState.getTimestamp(),
 						computationState.getCounter());
 
+				// 不产生新的ComputationState
 				newComputationStates = Collections.emptyList();
 				nfaChanged = true;
 			} else if (event != null) {
+				// 基于当前的ComputationState以及待处理的事件计算新的ComputationState集合
 				newComputationStates = computeNextStates(computationState, event, timestamp);
 
 				if (newComputationStates.size() != 1) {
@@ -286,9 +295,12 @@ public class NFA<T> implements Serializable {
 			}
 
 			//delay adding new computation states in case a stop state is reached and we discard the path.
+			// 当到达一个停止状态时，延迟添加新的计算状态，并丢弃该路径。
 			final Collection<ComputationState<T>> statesToRetain = new ArrayList<>();
 			//if stop state reached in this path
+			// 当前路径是否到达一个停止状态
 			boolean shouldDiscardPath = false;
+			// 遍历新产生的 ComputationState
 			for (final ComputationState<T> newComputationState: newComputationStates) {
 
 				if (newComputationState.isFinalState()) {
@@ -442,6 +454,9 @@ public class NFA<T> implements Serializable {
 	/**
 	 * Class for storing resolved transitions. It counts at insert time the number of
 	 * branching transitions both for IGNORE and TAKE actions.
+	 *
+	 * 用于存储已解析的转换的类。它在插入时针对 IGNORE 和 TAKE 的动作计算分支转换的数量
+	 *
  	 */
 	private static class OutgoingEdges<T> {
 		private List<StateTransition<T>> edges = new ArrayList<>();
@@ -512,6 +527,19 @@ public class NFA<T> implements Serializable {
 	 * 	   <li>Handle the Start State, as it always have to remain </li>
 	 *     <li>Release the corresponding entries in {@link SharedBuffer}.</li>
 	 *</ol>
+	 *
+	 * 根据给定的计算状态、当前事件、时间戳和内部状态机计算下一个计算状态。该算法是:
+	 *
+	 * <ol>
+	 *     <li>决定有效的转换和分支路径的数量。详见：OutgoingEdges</li>
+	 *     <li>执行转换:
+	 *       <ol>
+	 *       	<li></li>
+	 *       </ol>
+	 *     </li>
+	 *     <li>处理启动状态，因为它总是必须保持状态</li>
+	 *     <li>在 SharedBuffer 中释放相应的实例。</li>
+	 * </ol>
 	 *
 	 * @param computationState Current computation state
 	 * @param event Current event which is processed
@@ -699,12 +727,15 @@ public class NFA<T> implements Serializable {
 	}
 
 	private OutgoingEdges<T> createDecisionGraph(ComputationState<T> computationState, T event) {
+
+		// 根据计算状态获取已解析的转换边
 		final OutgoingEdges<T> outgoingEdges = new OutgoingEdges<>(computationState.getState());
 
 		final Stack<State<T>> states = new Stack<>();
 		states.push(computationState.getState());
 
 		//First create all outgoing edges, so to be able to reason about the Dewey version
+		// 首先创建所有的转换边，以便能够推理出杜威的版本
 		while (!states.isEmpty()) {
 			State<T> currentState = states.pop();
 			Collection<StateTransition<T>> stateTransitions = currentState.getStateTransitions();
@@ -712,12 +743,14 @@ public class NFA<T> implements Serializable {
 			// check all state transitions for each state
 			for (StateTransition<T> stateTransition : stateTransitions) {
 				try {
+					// 如果状态转换不需要条件或当前事件满足过滤条件
 					if (checkFilterCondition(computationState, stateTransition.getCondition(), event)) {
 						// filter condition is true
 						switch (stateTransition.getAction()) {
 							case PROCEED:
 								// simply advance the computation state, but apply the current event to it
 								// PROCEED is equivalent to an epsilon transition
+								// 在状态转换图中“前进”到下一个目标状态
 								states.push(stateTransition.getTargetState());
 								break;
 							case IGNORE:
