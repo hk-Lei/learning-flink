@@ -928,12 +928,12 @@ public class CEPOperatorTest extends TestLogger {
 
 		final Event startEvent1 = new Event(40, "A", 1.0);
 		final Event startEvent2 = new Event(40, "A", 2.0);
-		final Event startEvent3 = new Event(40, "B", 2.0);
-		final Event startEvent4 = new Event(40, "A", 2.0);
-		final Event startEvent5 = new Event(40, "A", 2.0);
-		final Event startEvent6 = new Event(40, "B", 2.0);
-		final Event startEvent7 = new Event(40, "A", 2.0);
-		final Event startEvent8 = new Event(40, "A", 2.0);
+		final Event startEvent3 = new Event(40, "B", 3.0);
+		final Event startEvent4 = new Event(40, "A", 4.0);
+		final Event startEvent5 = new Event(40, "A", 5.0);
+		final Event startEvent6 = new Event(40, "B", 6.0);
+		final Event startEvent7 = new Event(40, "A", 7.0);
+		final Event startEvent8 = new Event(40, "A", 8.0);
 
 		final Pattern<Event, ?> pattern = Pattern.<Event>begin("start").where(new SimpleCondition<Event>() {
 			private static final long serialVersionUID = 5726188262756267490L;
@@ -953,12 +953,15 @@ public class CEPOperatorTest extends TestLogger {
 					return false;
 				}
 
-				double sum = 0.0;
-				for (Event event : ctx.getEventsForPattern("middle")) {
-					sum += event.getPrice();
-				}
-				sum += value.getPrice();
-				return Double.compare(sum, 5.0) < 0;
+//				double sum = 0.0;
+//				for (Event event : ctx.getEventsForPattern("middle")) {
+//					sum += event.getPrice();
+//				}
+//				sum += value.getPrice();
+//				return Double.compare(sum, 5.0) < 0;
+
+				Iterable<Event> middle = ctx.getEventsForPattern("middle");
+				List<Event> list =
 			}
 		}).oneOrMore().allowCombinations();
 

@@ -59,6 +59,11 @@ import java.util.stream.StreamSupport;
  * operator state. This is necessary to trigger the execution for all keys upon receiving a new
  * watermark.
  *
+ * keyed 输入流的抽象 CEP 模式操作符，对于每一个 Key 创建一个 NFA 和一个优先队列来缓存乱序的消息。
+ * 这两个数据结构都依托于其管理的 keyed state，此外，所有键的集合都是作为操作符状态的一部分保存的。
+ * 这是在接收到新 watermark 时触发所有键执行的必要条件。
+ *
+ *
  * @param <IN> Type of the input elements
  * @param <KEY> Type of the key on which the input stream is keyed
  * @param <OUT> Type of the output elements
