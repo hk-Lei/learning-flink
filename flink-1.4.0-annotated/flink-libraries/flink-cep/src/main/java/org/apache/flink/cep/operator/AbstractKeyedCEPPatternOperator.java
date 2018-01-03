@@ -167,7 +167,7 @@ public abstract class AbstractKeyedCEPPatternOperator<IN, KEY, OUT, F extends Fu
 				bufferEvent(element.getValue(), currentTime);
 
 				// register a timer for the next millisecond to sort and emit buffered data
-				// 为下一毫秒注册一个计时器，以排序和释放缓冲数据
+				// 为下一毫秒注册一个 timer ，以排序和释放缓冲数据
 				timerService.registerProcessingTimeTimer(VoidNamespace.INSTANCE, currentTime + 1);
 			}
 
@@ -180,10 +180,15 @@ public abstract class AbstractKeyedCEPPatternOperator<IN, KEY, OUT, F extends Fu
 			// Events with timestamp smaller than or equal with the last seen watermark are considered late.
 			// Late events are put in a dedicated side output, if the user has specified one.
 
+			// 在 Event-time 处理中，我们假定 watermark 是正确的。
+			// 时间戳小于或等于最后一个可见 watermark 的事件被认为是迟到的。
+			// 如果用户指定了一个输出，迟到的事件会被放在一个专用的输出端。
 			if (timestamp > lastWatermark) {
 
 				// we have an event with a valid timestamp, so
 				// we buffer it until we receive the proper watermark.
+
+				//我们有一个具有有效时间戳的事件，因此我们缓冲它直到收到适当的 watermark。
 
 				saveRegisterWatermarkTimer();
 
@@ -215,6 +220,7 @@ public abstract class AbstractKeyedCEPPatternOperator<IN, KEY, OUT, F extends Fu
 
 		if (getExecutionConfig().isObjectReuseEnabled()) {
 			// copy the StreamRecord so that it cannot be changed
+			// 复制流记录，这样它就不能被更改
 			elementsForTimestamp.add(inputSerializer.copy(event));
 		} else {
 			elementsForTimestamp.add(event);
@@ -232,6 +238,12 @@ public abstract class AbstractKeyedCEPPatternOperator<IN, KEY, OUT, F extends Fu
 		// 4) update the stored state for the key, by only storing the new NFA and MapState iff they
 		//		have state to be used later.
 		// 5) update the last seen watermark.
+
+		// 1)获取 key 对应的事件队列及其相应的 NFA
+		// 2)基于事件时间或者自定义比较器（如果通过 NFA 中能获取到）来排序队列中的事件
+		// 3)将时间置为当前的水印，这样过期的 patterns 就会被丢弃
+		// 4)更新 key 的存储状态，只存储新的 NFA 和 MapState （如果它们稍后会使用）
+		// 5)更新最后一次看到的 watermark
 
 		// STEP 1
 		PriorityQueue<Long> sortedTimestamps = getSortedTimestamps();
