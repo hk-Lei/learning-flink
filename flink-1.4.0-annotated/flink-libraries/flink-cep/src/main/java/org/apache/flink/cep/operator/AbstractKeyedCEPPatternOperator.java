@@ -158,6 +158,7 @@ public abstract class AbstractKeyedCEPPatternOperator<IN, KEY, OUT, F extends Fu
 		if (isProcessingTime) {
 			if (comparator == null) {
 				// there can be no out of order elements in processing time
+				// 处于 processing 时间模式下不存在元素乱序的情况
 				NFA<IN> nfa = getNFA();
 				processEvent(nfa, element.getValue(), getProcessingTimeService().getCurrentProcessingTime());
 				updateNFA(nfa);
@@ -166,6 +167,7 @@ public abstract class AbstractKeyedCEPPatternOperator<IN, KEY, OUT, F extends Fu
 				bufferEvent(element.getValue(), currentTime);
 
 				// register a timer for the next millisecond to sort and emit buffered data
+				// 为下一毫秒注册一个计时器，以排序和释放缓冲数据
 				timerService.registerProcessingTimeTimer(VoidNamespace.INSTANCE, currentTime + 1);
 			}
 
@@ -194,6 +196,8 @@ public abstract class AbstractKeyedCEPPatternOperator<IN, KEY, OUT, F extends Fu
 	 * Registers a timer for {@code current watermark + 1}, this means that we get triggered
 	 * whenever the watermark advances, which is what we want for working off the queue of
 	 * buffered elements.
+	 *
+	 * 为当前 watermark + 1 注册一个 timer，意味着每当有 watermark 的时候，我们就触发处理缓存元素的队列的操作
 	 */
 	private void saveRegisterWatermarkTimer() {
 		long currentWatermark = timerService.currentWatermark();
