@@ -31,6 +31,10 @@ import java.util.Map;
  * exactly one result. If you want to return more than one result, then you have to implement
  * a {@link PatternFlatSelectFunction}.
  *
+ * 模式选择功能的基本接口。包含可以通过名称访问的检测到的事件的 map 来调用。
+ * 名称取决于{@link org.apache.flink.cep.pattern.Pattern}的定义。
+ * select 方法只返回一个结果。 如果你想返回多个结果，那么你必须实现一个{@link PatternFlatSelectFunction}。
+ *
  * <pre>{@code
  * PatternStream<IN> pattern = ...;
  *

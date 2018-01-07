@@ -25,10 +25,16 @@ import org.apache.flink.streaming.api.datastream.DataStream;
  * Utility class for complex event processing.
  *
  * <p>Methods which transform a {@link DataStream} into a {@link PatternStream} to do CEP.
+ *
+ * 复杂事件处理的工具类。
+ *
+ * <p> 将 DataStream 转换为 PatternStream 来执行CEP的方法。
  */
 public class CEP {
 	/**
 	 * Creates a {@link PatternStream} from an input data stream and a pattern.
+	 *
+	 * 从输入数据流和模式创建一个{@link PatternStream}。
 	 *
 	 * @param input DataStream containing the input events
 	 * @param pattern Pattern specification which shall be detected
@@ -41,6 +47,8 @@ public class CEP {
 
 	/**
 	 * Creates a {@link PatternStream} from an input data stream and a pattern.
+	 *
+	 * 从输入数据流和模式创建一个{@link PatternStream}。（带针对时间相同的事件比较器）
 	 *
 	 * @param input DataStream containing the input events
 	 * @param pattern Pattern specification which shall be detected

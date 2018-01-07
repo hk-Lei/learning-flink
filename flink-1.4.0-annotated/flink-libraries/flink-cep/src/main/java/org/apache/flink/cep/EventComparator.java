@@ -24,7 +24,7 @@ import java.util.Comparator;
 /**
  * Custom comparator used to compares two events.
  *
- * 自定义的比较器用于比较两个事件
+ * 自定义的比较器用于比较两个事件（用于时间相同的事件）
  *
  * @param <T> Type of the event
  */

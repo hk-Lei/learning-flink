@@ -32,6 +32,11 @@ import java.util.Map;
  * the sought-after pattern. Additionally, a collector is provided as a parameter. The collector
  * is used to emit an arbitrary number of resulting elements.
  *
+ * 模式选择功能的基础接口，可以产生多个结果元素。
+ * 一个 pattern flat select function 被称为检测到的事件的 map，这些事件由他们的名字标识。
+ * 名称由指定模式的{@link org.apache.flink.cep.pattern.Pattern}定义。
+ * 另外，收集器被提供作为参数。 收集器用于发射任意数量的结果元素。
+ *
  * <pre>{@code
  * PatternStream<IN> pattern = ...
  *

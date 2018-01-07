@@ -41,6 +41,11 @@ import java.util.List;
  * is used for a coherent serialization run. After the serialization has stopped, the identity
  * hash map should be cleared.
  *
+ * Type serializer 是序列化程序用于跟踪序列化对象，以便每个对象只序列化一次。 如果同一个对象再次被序列化，则写入一个引用句柄。
+ *
+ * <p> 避免重复是通过保持内部身份哈希映射来实现的。该映射包含所有序列化的对象。
+ * 要使序列化器工作，使用相同的序列化器进行连贯的序列化运行非常重要。 在序列化停止之后，身份哈希映射应该被清除。
+ *
  * @param <T> Type of the element to be serialized
  */
 @Internal

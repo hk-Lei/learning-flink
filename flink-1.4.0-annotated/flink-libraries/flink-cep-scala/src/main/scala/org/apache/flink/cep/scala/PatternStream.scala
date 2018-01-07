@@ -36,6 +36,10 @@ import scala.collection.Map
   * a [[org.apache.flink.cep.nfa.NFA]]. In order to process the detected sequences, the user has to
   * specify a [[PatternSelectFunction]] or a [[PatternFlatSelectFunction]].
   *
+  * CEP pattern 检测的流抽象。 pattern 流将检测到的模式序列作为与其名称相关联的事件的 map 发射。
+  * 该模式使用[[org.apache.flink.cep.nfa.NFA]]进行检测。
+  * 为了处理检测到的序列，用户必须指定一个[[PatternSelectFunction]]或[[PatternFlatSelectFunction]]。
+  *
   * @param jPatternStream Underlying pattern stream from Java API
   * @tparam T Type of the events
   */

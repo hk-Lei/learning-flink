@@ -42,6 +42,13 @@ import java.util.UUID;
  * <p>Additionally it allows to handle partially matched event patterns which have timed out. For this
  * the user has to specify a {@link PatternTimeoutFunction} or a {@link PatternFlatTimeoutFunction}.
  *
+ * CEP pattern 检测的流抽象。 pattern 流将检测到的模式序列作为与其名称相关联的事件的 map 发射。
+ * 该模式使用[[org.apache.flink.cep.nfa.NFA]]进行检测。
+ * 为了处理检测到的序列，用户必须指定一个[[PatternSelectFunction]]或[PatternFlatSelectFunction]。
+ *
+ * <p> 此外，它允许处理已经超时的部分匹配事件模式。
+ * 为此，用户必须指定一个{@link PatternTimeoutFunction}或者一个PatternFlatTimeoutFunction}。
+ *
  * @param <T> Type of the events
  */
 public class PatternStream<T> {

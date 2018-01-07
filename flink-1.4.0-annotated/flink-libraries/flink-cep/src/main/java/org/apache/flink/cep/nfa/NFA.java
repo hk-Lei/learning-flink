@@ -236,6 +236,10 @@ public class NFA<T> implements Serializable {
 	 * <p>If computations reach a stop state, the path forward is discarded and currently constructed path is returned
 	 * with the element that resulted in the stop state.
 	 *
+	 * 处理下一个输入事件。 如果某些计算达到最终状态，则返回结果事件序列。 如果计算超时并且超时处理被激活，则返回超时事件模式。
+	 *
+	 * <p>如果计算达到停止状态，则前向路径将被丢弃，并且当前构造的路径将与导致停止状态的元素一起返回。
+	 *
 	 * @param event The current event to be processed or null if only pruning shall be done
 	 * @param timestamp The timestamp of the current event
 	 * @param afterMatchSkipStrategy The skip strategy to use after per match

@@ -344,6 +344,8 @@ public abstract class AbstractKeyedCEPPatternOperator<IN, KEY, OUT, F extends Fu
 	 * Process the given event by giving it to the NFA and outputting the produced set of matched
 	 * event sequences.
 	 *
+	 * 通过将给定事件提供给 NFA 并输出生成的匹配事件序列集来处理给定事件。
+	 *
 	 * @param nfa NFA to be used for the event detection
 	 * @param event The current event to be processed
 	 * @param timestamp The timestamp of the event
