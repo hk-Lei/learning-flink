@@ -74,6 +74,8 @@ public class NFACompiler {
 	 * Compiles the given pattern into a {@link NFAFactory}. The NFA factory can be used to create
 	 * multiple NFAs.
 	 *
+	 * 将给定的模式编译成一个{@link NFAFactory}。 NFA工厂可以用来创建多个NFA。
+	 *
 	 * @param pattern Definition of sequence pattern
 	 * @param inputTypeSerializer Serializer for the input type
 	 * @param timeoutHandling True if the NFA shall return timed out event patterns
@@ -87,6 +89,7 @@ public class NFACompiler {
 		boolean timeoutHandling) {
 		if (pattern == null) {
 			// return a factory for empty NFAs
+			// 返回一个 空 NFA 的工厂
 			return new NFAFactoryImpl<>(inputTypeSerializer, 0, Collections.<State<T>>emptyList(), timeoutHandling);
 		} else {
 			final NFAFactoryCompiler<T> nfaFactoryCompiler = new NFAFactoryCompiler<>(pattern);
@@ -123,6 +126,8 @@ public class NFACompiler {
 		/**
 		 * Compiles the given pattern into a {@link NFAFactory}. The NFA factory can be used to create
 		 * multiple NFAs.
+		 *
+		 * 将给定的模式编译成一个{@link NFAFactory}。 NFA工厂可以用来创建多个NFA。
 		 */
 		void compileFactory() {
 			if (currentPattern.getQuantifier().getConsumingStrategy() == Quantifier.ConsumingStrategy.NOT_FOLLOW) {
