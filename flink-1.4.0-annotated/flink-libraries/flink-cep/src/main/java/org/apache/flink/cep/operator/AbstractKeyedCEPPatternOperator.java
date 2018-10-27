@@ -240,7 +240,7 @@ public abstract class AbstractKeyedCEPPatternOperator<IN, KEY, OUT, F extends Fu
 		// 5) update the last seen watermark.
 
 		// 1)获取 key 对应的事件队列及其相应的 NFA
-		// 2)基于事件时间或者自定义比较器（如果通过 NFA 中能获取到）来排序队列中的事件
+		// 2)基于事件时间和自定义比较器（如果通过 NFA 中能获取到）来排序队列中的事件
 		// 3)将时间置为当前的水印，这样过期的 patterns 就会被丢弃
 		// 4)更新 key 的存储状态，只存储新的 NFA 和 MapState （如果它们稍后会使用）
 		// 5)更新最后一次看到的 watermark
@@ -282,6 +282,10 @@ public abstract class AbstractKeyedCEPPatternOperator<IN, KEY, OUT, F extends Fu
 		//		by feeding them in the NFA
 		// 3) update the stored state for the key, by only storing the new NFA and MapState iff they
 		//		have state to be used later.
+
+		// 1)获取 key 对应的事件队列及其相应的 NFA
+		// 2)基于当前处理时间和自定义比较器（如果通过 NFA 中能获取到）来排序队列中的事件
+		// 3)更新 key 的存储状态，只存储新的 NFA 和 MapState （如果它们稍后会使用）
 
 		// STEP 1
 		PriorityQueue<Long> sortedTimestamps = getSortedTimestamps();
